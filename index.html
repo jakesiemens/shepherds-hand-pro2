@@ -1,3 +1,2482 @@
 <!DOCTYPE html>
-<html lang="en">...
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shepherd's Hand Pro</title>
+    
+    <!-- PWA (Progressive Web App) Meta Tags - REMOVED -->
+    <!-- Web App Manifest - REMOVED -->
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling on the body */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none; /* Prevent bounce effect on mobile */
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Modal animations */
+        .animate-enter { animation: enter 0.3s ease-out; }
+        .animate-leave { animation: leave 0.2s ease-in forwards; }
+        @keyframes enter {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes leave {
+            from { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 0; transform: scale(0.95) translateY(10px); }
+        }
+        
+        /* Red pulse animation for "Needs Contact" */
+        .pulse-red { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Avatar styles */
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            object-fit: cover;
+            background-color: #e2e8f0;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .avatar-lg { 
+            width: 80px; 
+            height: 80px; 
+            font-size: 2rem; 
+            border-width: 4px;
+        }
+        .avatar-sm { 
+            width: 32px; 
+            height: 32px; 
+            font-size: 0.875rem; 
+        }
+        
+        /* Clickable avatar for photo change */
+        .avatar-lg.clickable {
+            cursor: pointer;
+            position: relative;
+        }
+        .avatar-lg.clickable::after {
+            content: "\f030"; /* Font Awesome camera icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border-radius: 9999px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border: 2px solid white;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .avatar-lg.clickable:hover::after {
+            opacity: 1;
+        }
+
+        /* Navigation button active state */
+        .nav-btn.active { background-color: #e0f2fe; color: #0284c7; }
+        
+        /* Dashed input for person detail view */
+        .person-detail-input {
+            border: 2px dashed #cbd5e1;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .person-detail-input:focus {
+            border-style: solid;
+            border-color: #38bdf8;
+            outline: none;
+            background-color: #f8fafc;
+        }
+
+        /* Schedule iframe styles */
+        #schedule-container {
+            height: 100%;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+        }
+        #schedule-iframe {
+            height: 100%;
+            width: 100%;
+            border: none;
+            background-color: white;
+        }
+        
+        /* Styles for copyable resource cards */
+        .resource-card {
+            background-color: #f8fafc; /* slate-50 */
+            border: 1px solid #e2e8f0; /* slate-200 */
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 1rem; /* p-4 */
+            position: relative;
+        }
+        .resource-card-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #0f172a; /* slate-900 */
+            margin-bottom: 0.75rem; /* mb-3 */
+            padding-right: 4rem; /* Space for copy button */
+        }
+        .resource-card-content {
+            color: #334155; /* slate-700 */
+            white-space: pre-wrap; /* Allows copy/paste to keep line breaks */
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        .resource-card-content p {
+            margin-bottom: 1rem;
+        }
+        .resource-card-content ul, .resource-card-content ol {
+            margin-left: 1.25rem; /* ml-5 */
+            margin-bottom: 1rem;
+        }
+        .resource-card-content li {
+            margin-bottom: 0.25rem; /* mb-1 */
+        }
+        .copy-card-btn {
+            position: absolute;
+            top: 0.75rem; /* top-3 */
+            right: 0.75rem; /* right-3 */
+            background-color: #e2e8f0; /* slate-200 */
+            color: #475569; /* slate-600 */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            padding: 0.25rem 0.75rem; /* py-1 px-3 */
+            border-radius: 9999px; /* rounded-full */
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .copy-card-btn:hover {
+            background-color: #cbd5e1; /* slate-300 */
+        }
+        
+        /* Tab styles for People, Outreach, Hospitality views */
+        .view-tab-btn {
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: #475569; /* slate-600 */
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap; /* Prevent tabs from wrapping */
+            flex-shrink: 0;
+        }
+        .view-tab-btn.active {
+            color: #0284c7; /* sky-600 */
+            border-bottom-color: #0284c7; /* sky-600 */
+        }
+        /* Container for tabs to allow scrolling on mobile */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0; /* slate-200 */
+            margin-bottom: 1rem; /* mb-4 */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+    <!-- Main App Container -->
+    <div id="app" class="h-full w-full flex flex-col overflow-hidden">
+
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-lg shadow-sm p-4 flex justify-between items-center z-20 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-praying-hands text-2xl text-sky-600"></i>
+                <h1 class="text-xl font-bold text-slate-800 hidden sm:block">Shepherd's Hand</h1>
+            </div>
+            <div class="flex items-center gap-3 sm:gap-4">
+                 <button id="backup-btn" title="Backup Data" class="text-slate-500 hover:text-sky-600 font-medium text-sm flex items-center gap-2">
+                    <i class="fas fa-download"></i> <span class="hidden sm:inline">Backup</span>
+                </button>
+                 <button id="restore-btn" title="Restore Data" class="text-slate-500 hover:text-sky-600 font-medium text-sm flex items-center gap-2">
+                    <i class="fas fa-upload"></i> <span class="hidden sm:inline">Restore</span>
+                </button>
+                <input type="file" id="restore-file-input" class="hidden" accept=".json">
+                 <button id="settings-btn" title="Settings" class="text-slate-500 hover:text-sky-600 w-8 h-8 flex items-center justify-center">
+                    <i class="fas fa-cog text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area (Scrollable) -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100/50">
+            <!-- Loading indicator for initial data load -->
+            <div id="app-loading" class="flex flex-col items-center justify-center h-full text-slate-500">
+                <i class="fas fa-spinner animate-spin text-3xl"></i>
+                <p class="mt-4">Loading your ministry...</p>
+            </div>
+            <!-- Dynamic content will be injected here -->
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bg-white/80 backdrop-blur-lg shadow-[0_-2px_5px_rgba(0,0,0,0.05)] grid grid-cols-5 gap-1 p-2 z-40 border-t border-slate-200">
+            <button data-view="dashboard" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-home text-lg"></i><span class="text-xs font-medium mt-1">Home</span></button>
+            <button data-view="people" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-users text-lg"></i><span class="text-xs font-medium mt-1">People</span></button>
+            <button data-view="outreach" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-hand-sparkles text-lg"></i><span class="text-xs font-medium mt-1">Contact</span></button>
+            <button data-view="hospitality" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-utensils text-lg"></i><span class="text-xs font-medium mt-1">Hospitality</span></button>
+            <!-- UPDATED: Back to "Resources" -->
+            <button data-view="resources" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-book-open text-lg"></i><span class="text-xs font-medium mt-1">Resources</span></button>
+        </nav>
+    </div>
+
+    <!-- Modal Shell -->
+    <div id="modal-container" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div id="modal-content" class="bg-white w-full max-w-md rounded-2xl shadow-2xl animate-enter">
+            <!-- Modal content will be injected here -->
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-24 right-4 bg-slate-800 text-white py-2 px-5 rounded-full shadow-lg opacity-0 translate-y-4 transition-all duration-300 z-50 hidden">
+        <p id="toast-message"></p>
+    </div>
+
+    <!-- Local-Only JavaScript -->
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            // --- GLOBAL STATE ---
+            const state = { 
+                people: [], tasks: [], updates: [], milestones: [], hospitality: [], prayerRequests: [],
+                // REMOVED: state.sermons
+                settings: { scheduleUrl: '', contactPulse: 30, hospitalityPulse: 90 }, 
+                lastBackup: null, 
+                currentView: 'dashboard', selectedPerson: null, peopleSearchTerm: '', dataLoaded: false,
+                peopleViewTab: 'all', 
+                hospitalityViewTab: 'upcoming', 
+                outreachViewTab: 'all', 
+                spiritualGifts: ["Administration", "Apostleship", "Craftsmanship", "Creative Communication", "Discernment", "Encouragement", "Evangelism", "Faith", "Giving", "Healing", "Helps", "Hospitality", "Intercession", "Knowledge", "Leadership", "Mercy", "Miracles", "Prophecy", "Shepherding", "Teaching", "Wisdom"],
+                churchRoles: ["Greeter", "Usher", "Small Group Leader", "Children's Ministry", "Youth Group Leader", "Worship Team (Vocal)", "Worship Team (Instrument)", "Tech Team (Sound/Slides)", "Visitation Team", "Meal Train Coordinator", "Building Maintenance", "Event Planning Committee"]
+            };
+
+            // --- UI ELEMENT CACHE ---
+            const ui = {
+                mainApp: document.getElementById('main-app'),
+                mainContent: document.getElementById('main-content'),
+                navButtons: document.querySelectorAll('.nav-btn'),
+                modalContainer: document.getElementById('modal-container'),
+                modalContent: document.getElementById('modal-content'),
+                toast: document.getElementById('toast'),
+                toastMessage: document.getElementById('toast-message'),
+                appLoading: document.getElementById('app-loading'),
+                backupBtn: document.getElementById('backup-btn'),
+                restoreBtn: document.getElementById('restore-btn'),
+                restoreFileInput: document.getElementById('restore-file-input'),
+                settingsBtn: document.getElementById('settings-btn'), 
+            };
+
+            // --- UTILITY FUNCTIONS ---
+            const utils = {
+                formatDate(date, options = {}) { 
+                    if (!date) return 'N/A'; 
+                    const d = date instanceof Date ? date : new Date(date);
+                    const defaultOptions = { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' };
+                    return d.toLocaleDateString('en-US', { ...defaultOptions, ...options }); 
+                },
+                formatRelativeTime(date) { 
+                    if (!date) return ''; 
+                    const d = date instanceof Date ? date : new Date(date);
+                    const now = new Date(); 
+                    const seconds = Math.floor((now - d) / 1000); 
+                    let interval = seconds / 31536000; if (interval > 1) return `${Math.floor(interval)}y ago`; 
+                    interval = seconds / 2592000; if (interval > 1) return `${Math.floor(interval)}mo ago`; 
+                    interval = seconds / 86400; if (interval > 1) return `${Math.floor(interval)}d ago`; 
+                    interval = seconds / 3600; if (interval > 1) return `${Math.floor(interval)}h ago`; 
+                    interval = seconds / 60; if (interval > 1) return `${Math.floor(interval)}m ago`; 
+                    return 'Just now'; 
+                },
+                showToast(message) {
+                    ui.toastMessage.textContent = message;
+                    ui.toast.classList.remove('hidden', 'opacity-0', 'translate-y-4');
+                    setTimeout(() => {
+                        ui.toast.classList.add('opacity-0', 'translate-y-4');
+                        setTimeout(() => ui.toast.classList.add('hidden'), 300);
+                    }, 3000);
+                },
+                getIconForUpdateType(type) { 
+                    const icons = { 'Meeting': 'fa-solid fa-coffee', 'Phone Call': 'fa-solid fa-phone', 'Hospital Visit': 'fa-solid fa-hospital', 'Home Visit': 'fa-solid fa-house-user', 'Prayer': 'fa-solid fa-person-praying', 'Counseling': 'fa-solid fa-hand-holding-heart', 'General Note': 'fa-solid fa-note-sticky', 'WhatsApp Chat': 'fab fa-whatsapp', 'Hospitality': 'fa-solid fa-utensils' }; 
+                    return icons[type] || 'fa-solid fa-circle-info'; 
+                },
+                getIconForMilestoneType(type) { 
+                    const icons = { 'Birthday': 'fa-solid fa-birthday-cake', 'Anniversary': 'fa-solid fa-heart', 'Baptism': 'fa-solid fa-water', 'Joined Church': 'fa-solid fa-church', 'Loss of Loved One': 'fa-solid fa-cross', }; 
+                    return icons[type] || 'fa-solid fa-star'; 
+                },
+                formatPhoneNumberForWhatsApp(phone) { 
+                    if (!phone) return ''; 
+                    return phone.replace(/\D/g, ''); 
+                },
+                generateInitials(name) { 
+                    if (!name) return '?'; 
+                    const names = name.split(' '); 
+                    const initials = names.map(n => n[0]).join(''); 
+                    return initials.slice(0, 2).toUpperCase(); 
+                },
+                getAvatar(person, classes = '') { 
+                    const sizeClass = classes.includes('avatar-lg') ? 'avatar-lg' : (classes.includes('avatar-sm') ? 'avatar-sm' : 'avatar');
+                    // UPDATED: Now uses person.photoURL if it exists
+                    if (person.photoURL) { 
+                        return `<img src="${person.photoURL}" class="${sizeClass} ${classes}" alt="${person.name}">`; 
+                    } else { 
+                        return `<div class="${sizeClass} bg-sky-200 text-sky-700 ${classes}">${utils.generateInitials(person.name)}</div>`; 
+                    } 
+                },
+                getHouseholds() {
+                    const households = {};
+                    state.people.forEach(p => {
+                        const key = p.family || p.name;
+                        if (!households[key]) {
+                            households[key] = { name: key, members: [] };
+                        }
+                        households[key].members.push(p);
+                    });
+                    return Object.values(households).sort((a, b) => a.name.localeCompare(b.name)).map(h => {
+                        h.members.sort((a,b) => a.name.localeCompare(b.name));
+                        return h;
+                    });
+                },
+                getPersonContactStatus(person) {
+                    const lastUpdate = state.updates
+                        .filter(u => u.personId === person.id)
+                        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+                    
+                    const pulse = person.pulse || state.settings.contactPulse;
+                    
+                    if (!lastUpdate) {
+                        return { needsContact: true, lastUpdate: null }; 
+                    }
+                    
+                    const daysSinceContact = (new Date() - new Date(lastUpdate.createdAt)) / (1000 * 60 * 60 * 24);
+                    return {
+                        needsContact: daysSinceContact > pulse,
+                        lastUpdate: new Date(lastUpdate.createdAt)
+                    };
+                },
+                // --- NEW: Convert Blob to Base64 (for contact photos) ---
+                blobToDataURL(blob) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                },
+                // --- NEW: Resize Image and Convert to Base64 ---
+                resizeImage(file, width, height) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                
+                                canvas.width = width;
+                                canvas.height = height;
+                                
+                                // Simple center crop
+                                const S_X = img.width > img.height ? (img.width - img.height) / 2 : 0;
+                                const S_Y = img.height > img.width ? (img.height - img.width) / 2 : 0;
+                                const S_SIZE = Math.min(img.width, img.height);
+                                
+                                ctx.drawImage(img, S_X, S_Y, S_SIZE, S_SIZE, 0, 0, width, height);
+                                
+                                resolve(canvas.toDataURL('image/jpeg', 0.9)); // 90% quality JPEG
+                            };
+                            img.onerror = reject;
+                            img.src = event.target.result;
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                },
+                // --- NEW: Guess Gender from First Name ---
+                guessGender(name) {
+                    if (!name) return 'Unspecified';
+                    const firstName = name.split(' ')[0].toLowerCase();
+                    // These lists can be expanded
+                    const MALE_NAMES = new Set(['john', 'james', 'robert', 'michael', 'william', 'david', 'richard', 'joseph', 'thomas', 'charles', 'christopher', 'daniel', 'matthew', 'anthony', 'mark', 'donald', 'steven', 'paul', 'andrew', 'joshua', 'peter', 'jacob', 'adam', 'aaron', 'samuel', 'benjamin']);
+                    const FEMALE_NAMES = new Set(['mary', 'patricia', 'jennifer', 'linda', 'elizabeth', 'barbara', 'susan', 'jessica', 'sarah', 'karen', 'nancy', 'lisa', 'betty', 'margaret', 'sandra', 'ashley', 'kimberly', 'emily', 'donna', 'michelle', 'rebecca', 'laura', 'amanda', 'melissa', 'rachel', 'maria']);
+                    
+                    if (MALE_NAMES.has(firstName)) return 'Male';
+                    if (FEMALE_NAMES.has(firstName)) return 'Female';
+                    return 'Unspecified';
+                },
+                // --- GEMINI API FUNCTIONS ---
+                async callGeminiApi(payload, retries = 3, delay = 1000) {
+                    const apiKey = ""; // Populated by environment
+                    const model = payload.model || "gemini-2.5-flash-preview-09-2025";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 429 && retries > 0) {
+                                await new Promise(res => setTimeout(res, delay));
+                                return utils.callGeminiApi(payload, retries - 1, delay * 2);
+                            }
+                            throw new Error(`API Error: ${response.statusText}`);
+                        }
+                        
+                        const result = await response.json();
+
+                        if (result.promptFeedback) {
+                            console.warn("Gemini API: Prompt was blocked.", result.promptFeedback);
+                            return { text: "Your request was blocked by the safety filter. Please rephrase your topic.", sources: [] };
+                        }
+                        
+                        const candidate = result.candidates?.[0];
+
+                        if (candidate && candidate.content?.parts?.[0]?.text) {
+                            const text = candidate.content.parts[0].text;
+                            let sources = [];
+                            const groundingMetadata = candidate.groundingMetadata;
+
+                            if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                                sources = groundingMetadata.groundingAttributions
+                                    .map(attr => ({
+                                        uri: attr.web?.uri,
+                                        title: attr.web?.title,
+                                    }))
+                                    .filter(source => source.uri && source.title);
+                            }
+                            return { text, sources };
+                        } else if (candidate && candidate.finishReason) {
+                             console.warn("Gemini API: No content returned. Finish reason:", candidate.finishReason);
+                             let errorText = `The API returned no content (Reason: ${candidate.finishReason}).`;
+                             if (candidate.finishReason === 'SAFETY') {
+                                errorText = "The response was blocked by the safety filter.";
+                             }
+                             return { text: errorText, sources: [] };
+                        } else {
+                            console.error("Gemini API: Unknown response structure:", result);
+                            throw new Error("Invalid response structure from API.");
+                        }
+                    } catch (error) {
+                        console.error("Gemini API call failed:", error);
+                        if (retries > 0) {
+                            await new Promise(res => setTimeout(res, delay));
+                            return utils.callGeminiApi(payload, retries - 1, delay * 2);
+                        }
+                        return { text: "Error generating response. Please try again.", sources: [] };
+                    }
+                },
+                async getAISummary(text) {
+                    if (!text || text.trim().length < 10) {
+                        return { text: "Please provide more detail in your notes to generate a summary.", sources: [] };
+                    }
+                    const payload = {
+                        contents: [{ parts: [{ text: `Summarize the following pastoral notes into a concise paragraph. Focus on key topics, spiritual condition, and any action items: "${text}"` }] }]
+                    };
+                    return utils.callGeminiApi(payload);
+                },
+                async getSermonIllustration(sermonPoint) {
+                    const systemPrompt = `Act as an expert 'Sermon Illustration Creator', specializing in finding riveting, extremely effective, and powerful sermon illustrations from various sources. Your primary goal is to support a Conservative Bible-believing Evangelical Christian pastor who appreciates the theological style of John MacArthur, John Piper, Zac Poonen, Paul Washer, and David Gibbs.
+Purpose and Goals:
+* Generate five distinct sermon illustrations for every sermon point provided by the user.
+* Provide supplementary material, including statistics, power quotes, and parallel scripture references.
+* Maintain a tone and content consistent with conservative, evangelical, Bible-believing doctrine, reflecting the user's preferred preachers.
+Behaviors and Rules:
+1)  Illustration Generation:
+    For every sermon point provided by the user, generate five distinct illustrations. **Use Markdown headings (e.g., '### a) Historically Accurate') for each illustration.**
+    a)  **Historically Accurate:** One compelling illustration sourced accurately from history.
+    b)  **Humorous & Historically Accurate:** One illustration that is both genuinely humorous and verifiable through historical record.
+    c)  **Old Testament Story:** One powerful illustration derived specifically from an Old Testament narrative that directly illustrates the point.
+    d)  **Modern Story:** One relevant, contemporary story or anecdote.
+    e)  **Bonus/Wildcard:** A fifth unique illustration drawing from a field like science, nature, or classical literature, ensuring it remains doctrinally sound.
+2)  Supporting Material:
+    For each sermon point, provide the following supplementary content. **Use Markdown headings (e.g., '### A) Statistics') for each section.**
+    a)  **Statistics:** Provide relevant statistics that underscore the point being made, using concrete numbers and referencing the source (e.g., 'In 2022, 45% of...')
+    b)  **Power Quotes:** Generate five impactful, succinct quotes, each with a source (author/speaker).
+    c)  **Parallel Scriptures:** Provide three strong parallel scripture references. All scripture references must be cited exclusively in the King James Version (KJV).
+3)  Source Citation:
+    Provide sources for all historical illustrations, statistics, and power quotes. If the illustration is fictional (e.g., a hypothetical modern scenario), state that it is an illustrative example.
+Overall Tone:
+* Maintain a professional, scholarly, and theologically serious tone, suitable for conservative evangelical preaching.
+* Be thorough, ensuring all generated material is robust and usable in a pulpit context.
+* Avoid flippancy or content that undermines the authority of Scripture or core evangelical doctrines.`;
+
+                    const userQuery = sermonPoint;
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                        tools: [{ "google_search": {} }] 
+                    };
+                    
+                    return utils.callGeminiApi(payload); 
+                },
+                async getTaskBreakdown(taskDescription) {
+                    if (!taskDescription || taskDescription.trim().length < 5) {
+                        return { text: "Please provide a more detailed task to break down.", sources: [] };
+                    }
+                    const payload = {
+                        contents: [{ parts: [{ text: `You are a helpful pastoral assistant. Break down the following task into a concise, numbered checklist of sub-tasks. Task: "${taskDescription}"` }] }]
+                    };
+                    return utils.callGeminiApi(payload);
+                },
+                async getConversationStarters(person) {
+                    const lastUpdate = state.updates
+                        .filter(u => u.personId === person.id)
+                        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+                    
+                    const lastUpdateNotes = lastUpdate ? lastUpdate.notes : "No recent updates on file.";
+                    const keyInfo = person.keyInfo || "No key info on file.";
+                    
+                    const prompt = `You are a thoughtful pastoral assistant. Give me 3-4 brief, encouraging conversation starters for a church member named ${person.name}. I haven't spoken to them in a while.
+
+Here is some context:
+Key Pastoral Info: "${keyInfo}"
+Last Update Notes: "${lastUpdateNotes}"
+
+Please provide *only* the numbered list of conversation starters, nothing else.`;
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: prompt }] }]
+                    };
+                    return utils.callGeminiApi(payload);
+                },
+                // --- NEW: AI Prayer Summary ---
+                async getPrayerSummary() {
+                    const activeRequests = state.prayerRequests.filter(pr => pr.status === 'Active');
+                    if (activeRequests.length === 0) {
+                        return { text: "There are no active prayer requests to summarize.", sources: [] };
+                    }
+                    
+                    const requestsText = activeRequests.map((pr, index) => {
+                        const person = state.people.find(p => p.id === pr.personId);
+                        return `${index + 1}. For ${person?.name || 'Unknown'}: ${pr.request}`;
+                    }).join('\n');
+
+                    const prompt = `You are a pastoral assistant. Here is a list of active prayer requests from my congregation. Please summarize them into 3-4 thematic bullet points (e.g., Health Concerns, Family & Relationships, Work & Provision) so I can pray for them effectively.
+
+Here is the list:
+${requestsText}`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: prompt }] }]
+                    };
+                    return utils.callGeminiApi(payload);
+                }
+            };
+            
+            // --- MODAL SERVICE ---
+            const modalService = {
+                open(content, size = 'md') {
+                    const sizeClasses = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg', xl: 'max-w-xl', '2xl': 'max-w-2xl', 'full': 'max-w-full h-full' };
+                    ui.modalContent.className = `bg-white w-full rounded-2xl shadow-2xl animate-enter ${sizeClasses[size] || 'max-w-md'}`;
+                    // UPDATED: Use a taller modal for 'full'
+                    if (size === 'full') {
+                        ui.modalContent.className = `bg-white w-full h-[95vh] rounded-2xl shadow-2xl animate-enter flex flex-col`;
+                    }
+                    ui.modalContent.innerHTML = content;
+                    ui.modalContainer.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; 
+                },
+                close() {
+                    if (ui.modalContainer.classList.contains('hidden')) return;
+                    ui.modalContent.classList.remove('animate-enter');
+                    ui.modalContent.classList.add('animate-leave');
+                    ui.modalContainer.addEventListener('animationend', () => {
+                        ui.modalContainer.classList.add('hidden');
+                        ui.modalContent.classList.remove('animate-leave');
+                        ui.modalContent.innerHTML = '';
+                        document.body.style.overflow = 'auto'; 
+                    }, { once: true });
+                }
+            };
+            
+            // --- HTML RENDER FUNCTIONS ---
+            const render = {
+                dashboard() {
+                    if (!state.dataLoaded) return;
+                    ui.appLoading.classList.add('hidden');
+                    
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+                    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    
+                    const updatesLast30Days = state.updates.filter(u => new Date(u.createdAt) >= thirtyDaysAgo).length;
+                    const tasksCompletedLast30Days = state.tasks.filter(t => t.completed && new Date(t.createdAt) >= thirtyDaysAgo).length;
+
+                    const needsContact = state.people
+                        .map(p => ({ ...p, status: utils.getPersonContactStatus(p) }))
+                        .filter(p => p.status.needsContact)
+                        .sort((a,b) => (a.status.lastUpdate || 0) - (b.status.lastUpdate || 0));
+
+                    const upcomingTasks = state.tasks.filter(t => !t.completed).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)).slice(0, 3);
+                    const activePrayerRequests = state.prayerRequests.filter(pr => pr.status === 'Active').sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+                    
+                    const upcomingMilestones = state.milestones.filter(m => {
+                        const date = new Date(m.date);
+                        return date >= today && date <= thirtyDaysFromNow;
+                    }).sort((a,b) => new Date(a.date) - new Date(b.date));
+                    
+                    let backupReminderHtml = '';
+                    if (state.lastBackup) {
+                        const daysSinceBackup = Math.floor((new Date() - new Date(state.lastBackup)) / (1000 * 60 * 60 * 24));
+                        if (daysSinceBackup > 7) {
+                            backupReminderHtml = `<div class="bg-amber-100 border-l-4 border-amber-500 text-amber-700 p-4 rounded-lg shadow-sm" role="alert">
+                                <p class="font-bold">Backup Recommended</p>
+                                <p class="text-sm">Your last backup was ${daysSinceBackup} days ago. Keep your data safe!</p>
+                                <button id="dashboard-backup-btn" class="bg-amber-500 text-white font-semibold py-1 px-3 rounded-lg text-sm mt-2">Backup Now</button>
+                            </div>`;
+                        } else {
+                             backupReminderHtml = `<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 rounded-lg" role="alert">
+                                <p class="text-sm">Data backed up ${utils.formatRelativeTime(state.lastBackup)}. All good!</p>
+                            </div>`;
+                        }
+                    } else {
+                        backupReminderHtml = `<div class="bg-sky-100 border-l-4 border-sky-500 text-sky-700 p-4 rounded-lg shadow-sm" role="alert">
+                            <p class="font-bold">Welcome, Pastor!</p>
+                            <p class="text-sm">Remember to back up your data regularly using the "Backup" button in the header.</p>
+                        </div>`;
+                    }
+
+                    ui.mainContent.innerHTML = `<div class="animate-enter space-y-6">
+                        ${backupReminderHtml}
+                        <div class="bg-white p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
+                            <p class="text-slate-500 mt-1">Your ministry at a glance.</p>
+                             <div class="grid grid-cols-3 gap-2 mt-4">
+                                <button id="quick-add-update" class="bg-sky-100 text-sky-700 p-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-sky-200 transition"><i class="fas fa-plus"></i> Update</button>
+                                <button id="quick-add-task" class="bg-green-100 text-green-700 p-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-green-200 transition"><i class="fas fa-check"></i> Task</button>
+                                <button id="quick-add-person" class="bg-indigo-100 text-indigo-700 p-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-indigo-200 transition"><i class="fas fa-user-plus"></i> Person</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-3 px-2 flex items-center gap-2"><i class="fas fa-hand-sparkles text-red-500"></i>Needs Contact</h3>
+                                <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                                    ${needsContact.length > 0 ? needsContact.slice(0,5).map(p => `
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3 person-item cursor-pointer hover:bg-slate-50 p-2 rounded-lg flex-1" data-person-id="${p.id}">
+                                                ${utils.getAvatar(p)}
+                                                <div>
+                                                    <p class="font-medium text-slate-800">${p.name}</p>
+                                                    <p class="text-sm text-slate-500">${p.status.lastUpdate ? `Last contact: ${utils.formatRelativeTime(p.status.lastUpdate)}` : 'No contact logged'}</p>
+                                                </div>
+                                            </div>
+                                            <!-- UPDATED: Action buttons -->
+                                            <div class="flex-shrink-0 flex items-center gap-1">
+                                                <button data-person-id="${p.id}" class="ai-convo-starter-btn text-sky-600 hover:bg-sky-100 w-9 h-9 rounded-full flex items-center justify-center" title="Get conversation starters">
+                                                    <i class="fas fa-comment-dots text-lg"></i>
+                                                </button>
+                                                <button data-person-id="${p.id}" class="log-contact-btn bg-green-100 text-green-700 hover:bg-green-200 w-9 h-9 rounded-full flex items-center justify-center" title="Log Contact">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('') : '<p class="text-center text-slate-500 py-4">Everyone has been contacted recently. Great work!</p>'}
+                                </div>
+                            </div>
+                             <div>
+                                <!-- UPDATED: Added AI Summary button -->
+                                <div class="flex justify-between items-center mb-3 px-2">
+                                    <h3 class="text-lg font-semibold text-slate-700 flex items-center gap-2"><i class="fas fa-praying-hands text-purple-500"></i>Active Prayer Requests</h3>
+                                    <button id="summarize-prayers-btn" class="bg-indigo-100 text-indigo-700 text-xs font-semibold py-1 px-3 rounded-full hover:bg-indigo-200 transition" title="Summarize prayer requests">✨ Summarize</button>
+                                </div>
+                                <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                                   ${activePrayerRequests.length > 0 ? activePrayerRequests.map(pr => {
+                                       const p = state.people.find(person => person.id === pr.personId);
+                                       return `<div class="person-item cursor-pointer hover:bg-slate-50 p-2 rounded-lg" data-person-id="${p?.id || ''}">
+                                           <p class="font-medium text-slate-800">${p?.name || 'Unknown'}</p>
+                                           <p class="text-sm text-slate-600 truncate">${pr.request}</p>
+                                       </div>`
+                                   }).join('<hr class="my-1 border-slate-100">') : '<p class="text-center text-slate-500 py-4">No active prayer requests.</p>'}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-3 px-2"><i class="fas fa-clipboard-list text-indigo-500"></i>Upcoming Tasks</h3>
+                                <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">${upcomingTasks.length > 0 ? upcomingTasks.map(t => {
+                                     const p = state.people.find(person => person.id === t.personId);
+                                     return `<div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <button data-task-id="${t.id}" class="toggle-task-btn h-6 w-6 flex-shrink-0 flex items-center justify-center border-2 border-slate-300 rounded-full"></button>
+                                            <div>
+                                                <p class="font-medium text-slate-800">${t.description}</p>
+                                                <p class="text-sm text-slate-500">For ${p?.name || 'Unknown'}</p>
+                                            </div>
+                                        </div>
+                                        <button class="person-item bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded-md" data-person-id="${p?.id}">VIEW</button>
+                                    </div>`
+                                }).join('') : '<p class="text-center text-slate-500 py-4">No upcoming tasks.</p>'}</div>
+                            </div>
+                             <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-3 px-2"><i class="fas fa-birthday-cake text-pink-500"></i>Upcoming Milestones (30 Days)</h3>
+                                <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                                   ${upcomingMilestones.length > 0 ? upcomingMilestones.map(m => {
+                                       const p = state.people.find(person => person.id === m.personId);
+                                       return `<div class="person-item cursor-pointer hover:bg-slate-50 p-2 rounded-lg" data-person-id="${p?.id || ''}">
+                                            <div class="flex items-center justify-between">
+                                                <p class="font-medium text-slate-800">${p?.name || 'Unknown'}</p>
+                                                <span class="text-xs font-semibold ${m.type === 'Birthday' ? 'text-pink-600' : 'text-rose-600'}">${m.type}</span>
+                                            </div>
+                                           <p class="text-sm text-slate-500">${utils.formatDate(m.date, { month: 'short', day: 'numeric' })}</p>
+                                       </div>`
+                                   }).join('<hr class="my-1 border-slate-100">') : '<p class="text-center text-slate-500 py-4">No upcoming milestones.</p>'}
+                                </div>
+                            </div>
+                             <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-3 px-2">Ministry Insights (30 Days)</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm text-center">
+                                        <p class="text-3xl font-bold text-sky-600">${updatesLast30Days}</p>
+                                        <p class="text-sm font-medium text-slate-500">Updates</p>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm text-center">
+                                        <p class="text-3xl font-bold text-green-600">${tasksCompletedLast30Days}</p>
+                                        <p class="text-sm font-medium text-slate-500">Tasks Done</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-3 px-2">Quick Links</h3>
+                                <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                                    <button id="view-schedule-btn" class="bg-slate-100 text-slate-700 font-medium p-3 rounded-lg w-full text-left flex items-center gap-3 hover:bg-slate-200 transition">
+                                        <i class="fas fa-calendar-alt text-sky-600 w-5 text-center"></i> View Preaching Schedule
+                                    </button>
+                                    <button id="view-settings-btn" class="bg-slate-100 text-slate-700 font-medium p-3 rounded-lg w-full text-left flex items-center gap-3 hover:bg-slate-200 transition">
+                                        <i class="fas fa-cog text-slate-500 w-5 text-center"></i> Open Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+                
+                peopleList() {
+                     if (!state.dataLoaded) return;
+                     ui.appLoading.classList.add('hidden');
+                     
+                     ui.mainContent.innerHTML = `<div class="animate-enter">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-slate-800">Congregation</h2>
+                            <div class="flex items-center gap-2">
+                                <button id="import-contacts-btn" class="bg-green-600 text-white w-10 h-10 flex items-center justify-center rounded-full shadow-lg hover:bg-green-700 transition flex-shrink-0" title="Import from Phone">
+                                    <i class="fas fa-address-book"></i>
+                                </button>
+                                <button id="add-person-btn" class="bg-sky-600 text-white w-10 h-10 flex items-center justify-center rounded-full shadow-lg hover:bg-sky-700 transition flex-shrink-0" title="Add New Person"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="tab-container">
+                            <button class="view-tab-btn ${state.peopleViewTab === 'all' ? 'active' : ''}" data-tab="all">All People</button>
+                            <button class="view-tab-btn ${state.peopleViewTab === 'households' ? 'active' : ''}" data-tab="households">Households</button>
+                        </div>
+                        <div class="relative mb-4">
+                            <input type="search" id="people-search" placeholder="Search by name..." value="${state.peopleSearchTerm}" class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:ring-2 focus:ring-sky-500">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                            <ul id="people-list-container" class="divide-y divide-slate-200"></ul>
+                        </div>
+                    </div>`;
+                    
+                    ui.mainContent.querySelector('#people-search').addEventListener('input', e => {
+                        state.peopleSearchTerm = e.target.value;
+                        if (state.peopleViewTab === 'all') this._peopleListItems();
+                        else this._householdListItems();
+                    });
+                    
+                    if (state.peopleViewTab === 'all') this._peopleListItems();
+                    else this._householdListItems();
+                },
+                _peopleListItems() {
+                    const listContainer = ui.mainContent.querySelector("#people-list-container");
+                    if (!listContainer) return; 
+                    
+                    const searchTerm = state.peopleSearchTerm.toLowerCase();
+                    const filteredPeople = state.people
+                        .filter(p => p.name.toLowerCase().includes(searchTerm) || (p.family && p.family.toLowerCase().includes(searchTerm)))
+                        .sort((a, b) => a.name.localeCompare(b.name));
+                        
+                    if (filteredPeople.length > 0) {
+                        listContainer.innerHTML = filteredPeople.map(p => {
+                            const status = utils.getPersonContactStatus(p);
+                            const pulseDot = status.needsContact 
+                                ? '<div class="w-3 h-3 bg-red-500 rounded-full pulse-red"></div>' 
+                                : '<div class="w-3 h-3 bg-green-500 rounded-full"></div>';
+
+                            return `
+                            <li data-person-id="${p.id}" class="person-item p-3 hover:bg-slate-50 cursor-pointer transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        ${utils.getAvatar(p)}
+                                        <div>
+                                            <p class="font-semibold text-slate-800">${p.name}</p>
+                                            <p class="text-sm text-slate-500">${p.family || 'No household'}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        ${pulseDot}
+                                        <i class="fas fa-chevron-right text-slate-400"></i>
+                                    </div>
+                                </div>
+                                <div class="flex justify-around items-center pt-3 mt-3 border-t border-slate-100">
+                                    <!-- UPDATED: This is now a button for better event handling -->
+                                    ${p.phone ? `<button data-href="https://wa.me/${utils.formatPhoneNumberForWhatsApp(p.phone)}" data-person-id="${p.id}" class="contact-via-whatsapp-btn flex-1 text-center text-green-600 hover:bg-green-50 p-2 rounded-lg"><i class="fab fa-whatsapp mr-2"></i>Message</button>` : ''}
+                                    ${p.email ? `<a href="mailto:${p.email}" class="flex-1 text-center text-sky-600 hover:bg-sky-50 p-2 rounded-lg"><i class="fas fa-envelope mr-2"></i>Email</a>` : ''}
+                                </div>
+                            </li>`;
+                        }).join('');
+                    } else {
+                        listContainer.innerHTML = `<li class="p-8 text-center text-slate-500"><i class="fas fa-users text-4xl text-slate-300 mb-3"></i><p>No people found.</p></li>`;
+                    }
+                },
+                _householdListItems() {
+                    const listContainer = ui.mainContent.querySelector("#people-list-container");
+                    if (!listContainer) return;
+
+                    const searchTerm = state.peopleSearchTerm.toLowerCase();
+                    const households = utils.getHouseholds().filter(h => 
+                        h.name.toLowerCase().includes(searchTerm) || 
+                        h.members.some(m => m.name.toLowerCase().includes(searchTerm))
+                    );
+
+                    if (households.length > 0) {
+                        listContainer.innerHTML = households.map(h => `
+                            <li class="p-4">
+                                <div class="flex justify-between items-center">
+                                    <p class="font-semibold text-lg text-sky-700">${h.name}</p>
+                                    <span class="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded-full">${h.members.length} ${h.members.length === 1 ? 'member' : 'members'}</span>
+                                </div>
+                                <ul class="mt-3 space-y-2 pl-4 border-l-2 border-slate-200">
+                                    ${h.members.map(p => `
+                                        <li data-person-id="${p.id}" class="person-item flex items-center gap-3 p-2 hover:bg-slate-50 cursor-pointer rounded-lg">
+                                            ${utils.getAvatar(p, 'avatar-sm')}
+                                            <div>
+                                                <p class="font-medium text-slate-800">${p.name}</p>
+                                            </div>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </li>
+                        `).join('');
+                    } else {
+                        listContainer.innerHTML = `<li class="p-8 text-center text-slate-500"><i class="fas fa-home text-4xl text-slate-300 mb-3"></i><p>No households found.</p></li>`;
+                    }
+                },
+
+                personDetail(personId) {
+                    if (!state.dataLoaded) return;
+                    const person = state.people.find(p => p.id === personId);
+                    if (!person) { render.peopleList(); return; }
+                    state.selectedPerson = person;
+                    
+                    const familyMembers = person.family 
+                        ? state.people.filter(p => p.family === person.family && p.id !== person.id) 
+                        : [];
+                    
+                    let householdHtml = '';
+                    if (familyMembers.length > 0) {
+                        householdHtml = `
+                        <div class="mt-6 border-t border-slate-200 pt-4">
+                            <label class="block text-sm font-medium text-slate-500 mb-2">Household Members</label>
+                            <div class="flex flex-wrap gap-4">
+                                ${familyMembers.map(m => `
+                                    <div data-person-id="${m.id}" class="person-item flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-2 rounded-lg">
+                                        ${utils.getAvatar(m, 'avatar-sm')}
+                                        <p class="font-medium text-sm text-slate-700">${m.name}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                    }
+
+                    const personUpdates = state.updates.filter(u => u.personId === personId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    const personTasks = state.tasks.filter(t => t.personId === personId).sort((a, b) => (a.completed - b.completed) || new Date(b.createdAt) - new Date(a.createdAt));
+                    const personMilestones = state.milestones.filter(m => m.personId === personId).sort((a,b) => new Date(a.date) - new Date(b.date));
+                    const personPrayerReqs = state.prayerRequests.filter(pr => pr.personId === personId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    
+                    ui.mainContent.innerHTML = `<div class="animate-enter">
+                        <button id="back-to-people" class="text-slate-500 hover:text-sky-600 mb-4 -ml-1 flex items-center gap-2 font-medium"><i class="fas fa-arrow-left text-lg"></i> Back to People</button>
+                        
+                        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+                            <!-- UPDATED: Added clickable class to avatar -->
+                            <div class="flex items-center gap-4">
+                                <div id="change-photo-btn" class="avatar-lg clickable" title="Change Photo">
+                                    ${utils.getAvatar(person, 'avatar-lg')}
+                                </div>
+                                <input type="file" id="photo-file-input" class="hidden" accept="image/*">
+                                <div class="flex-1">
+                                    <input type="text" id="person-detail-name" value="${person.name}" class="text-3xl font-bold text-slate-800 w-full bg-transparent person-detail-input mb-1">
+                                    <input type="text" id="person-detail-family" value="${person.family || ''}" placeholder="Household Name" class="text-slate-500 w-full bg-transparent person-detail-input">
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <button id="delete-person-btn" data-person-id="${person.id}" class="text-red-500 hover:text-red-700 w-10 h-10 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100"><i class="fas fa-trash"></i></button>
+                                    <button id="save-person-details-btn" class="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition text-sm">Save</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div><label class="block text-sm font-medium text-slate-500">Phone</label><input type="tel" id="person-detail-phone" value="${person.phone || ''}" class="w-full person-detail-input"></div>
+                                <div><label class="block text-sm font-medium text-slate-500">Email</label><input type="email" id="person-detail-email" value="${person.email || ''}" class="w-full person-detail-input"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-500">Contact Pulse (days)</label>
+                                    <input type="number" id="person-detail-pulse" value="${person.pulse || state.settings.contactPulse}" class="w-full person-detail-input">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-500">Gender</label>
+                                    <select id="person-detail-gender" class="w-full person-detail-input bg-white">
+                                        <option value="Unspecified" ${person?.gender === 'Unspecified' || !person?.gender ? 'selected' : ''}>Unspecified</option>
+                                        <option value="Male" ${person?.gender === 'Male' ? 'selected' : ''}>Male</option>
+                                        <option value="Female" ${person?.gender === 'Female' ? 'selected' : ''}>Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-slate-500">Pastoral Concerns / Key Info</label>
+                                <textarea id="person-detail-key-info" class="w-full person-detail-input" rows="3" placeholder="e.g., Struggling with assurance, upcoming surgery, job search...">${person.keyInfo || ''}</textarea>
+                            </div>
+                            ${householdHtml}
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <button data-person-id="${person.id}" class="add-update-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-slate-700 hover:bg-slate-50 transition"><i class="fas fa-plus-circle text-sky-500 mr-2"></i>Update</button>
+                            <button data-person-id="${person.id}" class="add-task-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-slate-700 hover:bg-slate-50 transition"><i class="fas fa-clipboard-check text-green-500 mr-2"></i>Task</button>
+                            <button data-person-id="${person.id}" class="add-milestone-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-slate-700 hover:bg-slate-50 transition"><i class="fas fa-star text-yellow-500 mr-2"></i>Milestone</button>
+                            <button data-person-id="${person.id}" class="log-hospitality-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-slate-700 hover:bg-slate-50 transition"><i class="fas fa-utensils text-amber-500 mr-2"></i>Hospitality</button>
+                        </div>
+                        
+                        <div class="tab-container">
+                            <button class="view-tab-btn active flex-shrink-0" data-tab="updates">Updates</button>
+                            <button class="view-tab-btn flex-shrink-0" data-tab="tasks">Tasks</button>
+                            <button class="view-tab-btn flex-shrink-0" data-tab="milestones">Milestones</button>
+                            <button class="view-tab-btn flex-shrink-0" data-tab="prayer">Prayer</button>
+                            <button class="view-tab-btn flex-shrink-0" data-tab="calling">Calling</button>
+                        </div>
+                        
+                        <div id="person-tab-content" class="space-y-4">
+                            <div id="updates-content" class="tab-pane">${personUpdates.length > 0 ? personUpdates.map(u => `
+                                <div class="bg-white p-4 rounded-xl shadow-sm"><div class="flex items-start gap-4"><div class="bg-slate-100 text-slate-500 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="${utils.getIconForUpdateType(u.type)}"></i></div><div class="flex-1"><div class="flex justify-between items-baseline"><p class="font-semibold text-slate-700">${u.type}</p><p class="text-xs text-slate-400">${utils.formatDate(u.createdAt)}</p></div><p class="text-slate-600 mt-1 whitespace-pre-wrap">${u.notes}</p></div></div><div class="flex justify-end gap-2 mt-2 pt-2 border-t border-slate-100"><button data-update-id="${u.id}" class="edit-update-btn text-xs font-semibold text-slate-400 hover:text-sky-600">EDIT</button><button data-update-id="${u.id}" class="delete-update-btn text-xs font-semibold text-slate-400 hover:text-red-500">DELETE</button></div></div>`).join('') : `<p class="text-center text-slate-500 py-8">No updates logged for ${person.name}.</p>`}
+                            </div>
+                            <div id="tasks-content" class="tab-pane hidden">${personTasks.length > 0 ? personTasks.map(t => `<div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between"><div class="flex items-center gap-3"><button data-task-id="${t.id}" class="toggle-task-btn h-6 w-6 flex items-center justify-center border-2 ${t.completed ? 'border-green-500 bg-green-500' : 'border-slate-300'} rounded-full transition">${t.completed ? '<i class="fas fa-check text-white text-xs"></i>' : ''}</button><div><p class="font-medium ${t.completed ? 'text-slate-400 line-through' : 'text-slate-800'}">${t.description}</p><p class="text-sm text-slate-500">Due: ${utils.formatDate(t.dueDate)}</p></div></div><button data-task-id="${t.id}" class="delete-task-btn text-slate-400 hover:text-red-500 transition"><i class="fas fa-trash"></i></button></div>`).join('') : `<p class="text-center text-slate-500 py-8">No tasks for ${person.name}.</p>`}
+                            </div>
+                            <div id="milestones-content" class="tab-pane hidden">${personMilestones.length > 0 ? personMilestones.map(m => `<div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between"><div class="flex items-center gap-4"><div class="bg-yellow-100 text-yellow-600 h-10 w-10 flex items-center justify-center rounded-full"><i class="${utils.getIconForMilestoneType(m.type)}"></i></div><div><p class="font-semibold text-slate-700">${m.type}</p><p class="text-sm text-slate-500">${utils.formatDate(m.date)}</p></div></div><div class="flex items-center gap-2"><button data-milestone-id="${m.id}" class="edit-milestone-btn text-slate-400 hover:text-sky-600 transition"><i class="fas fa-pencil-alt"></i></button><button data-milestone-id="${m.id}" class="delete-milestone-btn text-slate-400 hover:text-red-500 transition"><i class="fas fa-trash"></i></button></div></div>`).join('') : `<p class="text-center text-slate-500 py-8">No milestones for ${person.name}.</p>`}
+                            </div>
+                            <div id="prayer-content" class="tab-pane hidden">
+                                <div class="text-right mb-4"><button data-person-id="${person.id}" class="add-prayer-request-btn bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg">Add Prayer Request</button></div>
+                                <div class="space-y-3">
+                                    ${personPrayerReqs.length > 0 ? personPrayerReqs.map(pr => `<div class="bg-white p-4 rounded-xl shadow-sm"><div class="flex justify-between items-start"><p class="text-slate-700 flex-1">${pr.request}</p><div class="flex items-center gap-3"><button data-pr-id="${pr.id}" class="edit-prayer-request-btn text-slate-400 hover:text-sky-600"><i class="fas fa-pencil-alt"></i></button><button data-pr-id="${pr.id}" class="toggle-prayer-status-btn font-semibold text-sm py-1 px-3 rounded-full ${pr.status === 'Answered' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${pr.status}</button><button data-pr-id="${pr.id}" class="delete-prayer-request-btn text-slate-400 hover:text-red-500"><i class="fas fa-trash"></i></button></div></div><p class="text-xs text-slate-400 mt-2">Requested on ${utils.formatDate(pr.createdAt)}</p></div>`).join('') : `<p class="text-center text-slate-500 py-8">No prayer requests logged for ${person.name}.</p>`}
+                                </div>
+                            </div>
+                            <div id="calling-content" class="tab-pane hidden">
+                                <div class="bg-white p-4 rounded-xl shadow-sm">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="text-lg font-semibold text-slate-800">Calling & Gifts</h3>
+                                        <button data-person-id="${person.id}" class="edit-calling-btn bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm">Edit</button>
+                                    </div>
+                                    <p class="text-xs font-bold text-sky-700 uppercase tracking-wider">Gifts</p>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        ${(person.gifts && person.gifts.length > 0) ? person.gifts.map(g => `<span class="bg-sky-100 text-sky-800 text-xs font-medium px-2 py-0.5 rounded-full">${g}</span>`).join('') : '<span class="text-slate-400 text-xs">None identified</span>'}
+                                    </div>
+                                    <p class="text-xs font-bold text-green-700 uppercase tracking-wider mt-2">Roles</p>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        ${(person.roles && person.roles.length > 0) ? person.roles.map(r => `<span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full">${r}</span>`).join('') : '<span class="text-slate-400 text-xs">None assigned</span>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+                outreach() {
+                     if (!state.dataLoaded) return;
+                     ui.appLoading.classList.add('hidden');
+                     
+                     let needsContact = state.people
+                        .map(p => ({ ...p, status: utils.getPersonContactStatus(p) }))
+                        .filter(p => p.status.needsContact);
+                    
+                    if (state.outreachViewTab === 'males') {
+                        needsContact = needsContact.filter(p => p.gender === 'Male');
+                    } else if (state.outreachViewTab === 'females') {
+                        needsContact = needsContact.filter(p => p.gender === 'Female');
+                    }
+                    
+                    needsContact.sort((a,b) => (a.status.lastUpdate || 0) - (b.status.lastUpdate || 0)); 
+                     
+                     ui.mainContent.innerHTML = `<div class="animate-enter">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-slate-800">Needs Contact</h2>
+                        </div>
+                        <div class="tab-container">
+                            <button class="view-tab-btn ${state.outreachViewTab === 'all' ? 'active' : ''}" data-tab="all">All (${needsContact.filter(p => p.gender !== 'Male' && p.gender !== 'Female').length + needsContact.filter(p => p.gender === 'Male').length + needsContact.filter(p => p.gender === 'Female').length})</button>
+                            <button class="view-tab-btn ${state.outreachViewTab === 'males' ? 'active' : ''}" data-tab="males">Males (${needsContact.filter(p => p.gender === 'Male').length})</button>
+                            <button class="view-tab-btn ${state.outreachViewTab === 'females' ? 'active' : ''}" data-tab="females">Females (${needsContact.filter(p => p.gender === 'Female').length})</button>
+                        </div>
+                        <div class="mb-6">
+                            <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                                ${needsContact.length > 0 ? needsContact.map(p => {
+                                    return `
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 person-item cursor-pointer hover:bg-slate-50 p-2 rounded-lg flex-1" data-person-id="${p.id}">
+                                        ${utils.getAvatar(p)}
+                                        <div>
+                                            <p class="font-medium text-slate-800">${p.name}</p>
+                                            <p class="text-sm text-slate-500">${p.status.lastUpdate ? `Last contact: ${utils.formatRelativeTime(p.status.lastUpdate)}` : 'No contact logged'}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button data-person-id="${p.id}" class="ai-convo-starter-btn text-sky-600 hover:bg-sky-100 w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center" title="Get conversation starters">
+                                            <i class="fas fa-comment-dots text-lg"></i>
+                                        </button>
+                                        <!-- UPDATED: This is now a button for better event handling -->
+                                        ${p.phone ? `<button data-href="https://wa.me/${utils.formatPhoneNumberForWhatsApp(p.phone)}" data-person-id="${p.id}" class="contact-via-whatsapp-btn bg-green-100 text-green-700 h-10 w-10 flex items-center justify-center rounded-full"><i class="fab fa-whatsapp text-xl"></i></button>` : ''}
+                                        <button data-person-id="${p.id}" class="log-contact-btn bg-sky-100 text-sky-700 h-10 w-10 flex items-center justify-center rounded-full"><i class="fas fa-edit"></i></button>
+                                    </div>
+                                </div>`}).join('') : `<p class="text-center text-slate-500 py-8">Everyone has been contacted recently.</p>`}
+                            </div>
+                        </div>
+                    </div>`;
+                },
+                hospitality() {
+                    if (!state.dataLoaded) return;
+                    
+                    ui.mainContent.innerHTML = `<div class="animate-enter">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-slate-800">Hospitality</h2>
+                            <button id="add-hospitality-btn" class="bg-amber-500 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"><i class="fas fa-plus"></i> Add Event</button>
+                        </div>
+                        <div class="tab-container">
+                            <button class="view-tab-btn ${state.hospitalityViewTab === 'upcoming' ? 'active' : ''}" data-tab="upcoming">Upcoming</button>
+                            <button class="view-tab-btn ${state.hospitalityViewTab === 'past' ? 'active' : ''}" data-tab="past">Past</button>
+                            <button class="view-tab-btn ${state.hospitalityViewTab === 'households' ? 'active' : ''}" data-tab="households">By Household</button>
+                        </div>
+                        <div id="hospitality-content-container"></div>
+                    </div>`;
+                    
+                    if (state.hospitalityViewTab === 'upcoming') this._hospitalityUpcoming();
+                    else if (state.hospitalityViewTab === 'past') this._hospitalityPast();
+                    else this._hospitalityByHousehold();
+                },
+                _hospitalityUpcoming() {
+                    const container = ui.mainContent.querySelector('#hospitality-content-container');
+                    if (!container) return;
+                    const upcomingEvents = state.hospitality.filter(h => new Date(h.date) >= new Date()).sort((a,b) => new Date(a.date) - new Date(b.date));
+                    container.innerHTML = `<div class="space-y-3">${upcomingEvents.length > 0 ? upcomingEvents.map(h => this._hospitalityEventCard(h)).join('') : '<p class="text-center text-slate-500 py-8">No upcoming hospitality events.</p>'}</div>`;
+                },
+                _hospitalityPast() {
+                    const container = ui.mainContent.querySelector('#hospitality-content-container');
+                    if (!container) return;
+                    const pastEvents = state.hospitality.filter(h => new Date(h.date) < new Date()).sort((a,b) => new Date(b.date) - new Date(a.date));
+                    container.innerHTML = `<div class="space-y-3">${pastEvents.length > 0 ? pastEvents.map(h => this._hospitalityEventCard(h)).join('') : '<p class="text-center text-slate-500 py-8">No past hospitality events.</p>'}</div>`;
+                },
+                _hospitalityEventCard(h) {
+                    return `<div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-slate-800">${(h.attendee_families || []).join(', ')}</p>
+                                <p class="text-sm text-slate-500">${utils.formatDate(new Date(h.date), {weekday: 'long'})} &bull; ${h.type || 'Event'}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button data-event-id="${h.id}" class="edit-hospitality-btn text-slate-400 hover:text-sky-600 px-2"><i class="fas fa-pencil-alt"></i></button>
+                                <button data-event-id="${h.id}" class="delete-hospitality-btn text-slate-400 hover:text-red-500 px-2"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        ${!h.journal ? `<div class="text-right mt-2"><button data-event-id="${h.id}" class="log-hospitality-journal-btn bg-amber-100 text-amber-700 font-semibold py-1 px-3 rounded-lg text-sm">Log Journal</button></div>` : `<p class="text-sm text-slate-600 mt-2 pt-2 border-t border-slate-100 whitespace-pre-wrap">${h.journal}</p>`}
+                    </div>`;
+                },
+                _hospitalityByHousehold() {
+                    const container = ui.mainContent.querySelector('#hospitality-content-container');
+                    if (!container) return;
+
+                    const households = utils.getHouseholds();
+                    const hospitalityPulse = state.settings.hospitalityPulse;
+                    const allEvents = state.hospitality;
+
+                    const householdData = households.map(h => {
+                        const lastEvent = allEvents
+                            .filter(event => (event.attendee_families || []).includes(h.name))
+                            .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                        
+                        let daysSinceHosted = null;
+                        let needsHosting = false;
+                        
+                        if (lastEvent) {
+                            daysSinceHosted = Math.floor((new Date() - new Date(lastEvent.date)) / (1000 * 60 * 60 * 24));
+                            if (daysSinceHosted > hospitalityPulse) needsHosting = true;
+                        } else {
+                            needsHosting = true; 
+                        }
+                        
+                        return { ...h, lastEvent, daysSinceHosted, needsHosting };
+                    });
+                    
+                    householdData.sort((a, b) => {
+                        if (a.needsHosting && !b.needsHosting) return -1;
+                        if (!a.needsHosting && b.needsHosting) return 1;
+                        if (a.daysSinceHosted === null && b.daysSinceHosted !== null) return -1; 
+                        if (a.daysSinceHosted !== null && b.daysSinceHosted === null) return 1;
+                        return (b.daysSinceHosted || 0) - (a.daysSinceHosted || 0); 
+                    });
+
+                    container.innerHTML = `<div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                        ${householdData.length > 0 ? householdData.map(h => `
+                            <div class="flex items-center justify-between p-2 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
+                                        <i class="fas fa-home text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">${h.name}</p>
+                                        <p class="text-sm text-slate-500">
+                                            ${h.lastEvent ? `Last hosted: ${utils.formatRelativeTime(h.lastEvent.date)}` : 'No hospitality logged'}
+                                        </p>
+                                    </div>
+                                </div>
+                                ${h.needsHosting ? '<div class="w-3 h-3 bg-red-500 rounded-full pulse-red"></div>' : '<div class="w-3 h-3 bg-green-500 rounded-full"></div>'}
+                            </div>
+                        `).join('') : '<p class="text-center text-slate-500 py-8">No households found.</p>'}
+                    </div>`;
+                },
+                // --- UPDATED: Back to "resources" ---
+                resources() {
+                    if (!state.dataLoaded) return;
+                    ui.appLoading.classList.add('hidden');
+
+                    ui.mainContent.innerHTML = `<div class="animate-enter space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-2xl font-bold text-slate-800">Sermon Illustration Creator</h2>
+                            <p class="text-slate-500 mt-1">Warm greetings, pastor. Please provide your sermon point to begin.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="sermon-topic-input" class="w-full px-4 py-2 border border-slate-300 rounded-full" placeholder="Enter a sermon point...">
+                            <button id="get-illustration-btn" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-full hover:bg-sky-700 transition">Find</button>
+                        </div>
+                        <div id="illustration-output" class="space-y-4">
+                            <p class="text-slate-400 text-center py-10">Your illustrations will appear here.</p>
+                        </div>
+                    </div>`;
+                },
+                _buildResourceCards(markdownText) {
+                    let html = '';
+                    const sections = markdownText.split(/###\s+(?=[a-zA-Z0-9])/); 
+                    
+                    const intro = sections[0].trim();
+                    if (intro && !intro.startsWith("a)")) {
+                        html += `<div class="bg-white p-6 rounded-2xl shadow-sm"><p class="text-slate-700 italic">${intro.replace(/\*\*\*/g, '')}</p></div>`;
+                    }
+
+                    for (let i = 1; i < sections.length; i++) {
+                        const section = sections[i];
+                        const firstLineEnd = section.indexOf('\n');
+                        const title = section.substring(0, firstLineEnd).trim().replace(/\*\*/g, ''); 
+                        const content = section.substring(firstLineEnd).trim();
+                        
+                        const safeContent = content
+                            .replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>') 
+                            .replace(/(\n\s*){2,}/g, '</p><p>') 
+                            .replace(/\n/g, '<br>');
+
+                        html += `
+                        <div class="resource-card">
+                            <button class="copy-card-btn" data-clipboard-target-id="resource-content-${i}">
+                                <i class="fas fa-copy mr-1"></i> Copy
+                            </button>
+                            <h3 class="resource-card-title">${title}</h3>
+                            <div class="resource-card-content" id="resource-content-${i}">
+                                <p>${safeContent}</p>
+                            </div>
+                        </div>`;
+                    }
+                    return html;
+                }
+            };
+            
+            // --- MODAL RENDER FUNCTIONS ---
+            const modals = {
+                 // --- UPDATED: logContact now accepts an optional type ---
+                 logContact(personId, type = null) {
+                    const person = state.people.find(p => p.id === personId);
+                    const typeOptions = ['WhatsApp Chat', 'Phone Call', 'Meeting', 'Home Visit', 'Hospital Visit', 'Prayer', 'Counseling', 'General Note'];
+                    
+                    modalService.open(`<form id="log-contact-form" class="p-6" data-person-id="${personId}">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Log Contact for ${person.name}</h3>
+                            <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-600">&times;</button>
+                        </div>
+                        <div class="space-y-4">
+                             <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Type</label>
+                                <select id="update-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    <!-- UPDATED: Pre-selects type if provided -->
+                                    ${typeOptions.map(t => `<option value="${t}" ${t === type ? 'selected' : ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="update-notes" class="block text-sm font-medium text-slate-600 mb-1">Notes from conversation</label>
+                                <textarea id="update-notes" rows="5" class="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Enter details here..."></textarea>
+                            </div>
+                            <button type="button" id="ai-summary-btn" class="w-full bg-indigo-100 text-indigo-700 font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-indigo-200">
+                                <i class="fas fa-magic"></i> Generate AI Summary
+                            </button>
+                            <div id="ai-spinner" class="text-center hidden"><i class="fas fa-spinner animate-spin text-sky-600"></i> Generating...</div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg">Log Contact</button>
+                        </div>
+                    </form>`);
+                 },
+                 logHospitalityJournal(eventId) {
+                    const event = state.hospitality.find(e => e.id === eventId);
+                    if (!event) return;
+                    modalService.open(`<form id="hospitality-journal-form" class="p-6" data-event-id="${eventId}">
+                        <h3 class="text-xl font-bold mb-4">Journal for ${(event.attendee_families || []).join(', ')}</h3>
+                        <textarea id="hospitality-journal" rows="8" class="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Log notes, prayers, or praises from your time together...">${event.journal || ''}</textarea>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-amber-500 text-white font-semibold py-2 px-5 rounded-lg">Save Journal</button>
+                        </div>
+                    </form>`);
+                 },
+                 logQuickHospitality(person) {
+                    const familyName = person.family || person.name;
+                    const today = new Date().toISOString().split('T')[0];
+                    modalService.open(`<form id="quick-hospitality-form" class="p-6" data-family-name="${familyName}">
+                        <h3 class="text-xl font-bold mb-4">Log Hospitality for ${familyName}</h3>
+                         <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Family/Household</label>
+                                <input type="text" class="w-full px-3 py-2 border bg-slate-100 rounded-lg" value="${familyName}" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Date</label>
+                                <input type="date" id="quick-hospitality-date" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${today}" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Type</label>
+                                <select id="quick-hospitality-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    <option value="Home Visit" selected>Home Visit</option>
+                                    <option value="Sunday Lunch">Sunday Lunch</option>
+                                    <option value="Weekday Visit">Weekday Visit</option>
+                                    <option value="Other Event">Other Event</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-amber-500 text-white font-semibold py-2 px-5 rounded-lg">Save & Log Journal</button>
+                        </div>
+                    </form>`);
+                 },
+                 // --- UPDATED: addEditPerson with Photo Upload ---
+                 addEditPerson(person) { 
+                    const isEditing = !!person; 
+                    modalService.open(`<form id="person-form" data-person-id="${person?.id || ''}" class="p-6">
+                        <input type="file" id="modal-photo-input" class="hidden" accept="image/*">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold">${isEditing ? 'Edit Person' : 'Add New Person'}</h3>
+                            <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-600">&times;</button>
+                        </div>
+                        
+                        <!-- Photo Upload -->
+                        <div class="flex flex-col items-center mb-4">
+                            <div id="modal-avatar-preview" class="avatar-lg clickable" title="Change Photo">
+                                ${isEditing ? utils.getAvatar(person, 'avatar-lg') : '<div class="avatar-lg bg-sky-200 text-sky-700">?</div>'}
+                            </div>
+                            ${isEditing && person.photoURL ? `<button type="button" id="remove-photo-btn" class="text-xs text-red-500 hover:underline mt-1">Remove Photo</button>` : ''}
+                        </div>
+
+                        <div class="space-y-4">
+                            <div><label for="person-name" class="block text-sm font-medium text-slate-600 mb-1">Full Name</label><input type="text" id="person-name" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.name || ''}" required></div>
+                            <div><label for="person-family" class="block text-sm font-medium text-slate-600 mb-1">Family / Household</label><input type="text" id="person-family" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.family || ''}" placeholder="e.g., The Smiths"></div>
+                            <div><label for="person-phone" class="block text-sm font-medium text-slate-600 mb-1">Phone Number</label><input type="tel" id="person-phone" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.phone || ''}"></div>
+                            <div><label for="person-email" class="block text-sm font-medium text-slate-600 mb-1">Email</label><input type="email" id="person-email" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.email || ''}"></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="person-pulse" class="block text-sm font-medium text-slate-600 mb-1">Contact Pulse</label>
+                                    <input type="number" id="person-pulse" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.pulse || state.settings.contactPulse}" required>
+                                </div>
+                                <div>
+                                    <label for="person-gender" class="block text-sm font-medium text-slate-600 mb-1">Gender</label>
+                                    <select id="person-gender" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                        <option value="Unspecified" ${person?.gender === 'Unspecified' || !person?.gender ? 'selected' : ''}>Unspecified</option>
+                                        <option value="Male" ${person?.gender === 'Male' ? 'selected' : ''}>Male</option>
+                                        <option value="Female" ${person?.gender === 'Female' ? 'selected' : ''}>Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 -mt-2">Set contact pulse in days (reminds you if no contact).</p>
+                            
+                            <div>
+                                <label for="person-key-info" class="block text-sm font-medium text-slate-600 mb-1">Pastoral Concerns / Key Info</label>
+                                <textarea id="person-key-info" class="w-full px-3 py-2 border border-slate-300 rounded-lg" rows="3" placeholder="e.g., Struggling with assurance...">${person?.keyInfo || ''}</textarea>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-sky-700 transition">Save</button>
+                        </div>
+                    </form>`); 
+                 },
+                 addEditUpdate(personId = null, update = null) {
+                    const isEditing = !!update;
+                    const peopleOptions = state.people.sort((a,b) => a.name.localeCompare(b.name)).map(p => `<option value="${p.id}" ${personId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+                    const personSelect = personId === null ? `<div><label class="block text-sm font-medium text-slate-600 mb-1">Person</label><select id="update-person-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg" required>${peopleOptions}</select></div>` : '';
+                    const types = ['Meeting', 'Phone Call', 'WhatsApp Chat', 'Hospital Visit', 'Home Visit', 'Prayer', 'Counseling', 'General Note'];
+                    modalService.open(`<form id="update-form" class="p-6" data-person-id="${personId || ''}" data-update-id="${update?.id || ''}">
+                        <h3 class="text-xl font-bold mb-4">${isEditing ? 'Edit' : 'Log'} Update</h3>
+                        <div class="space-y-4">
+                            ${personSelect}
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Type</label>
+                                <select id="update-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    ${types.map(t => `<option value="${t}" ${isEditing && t === update.type ? 'selected' : ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Notes</label>
+                                <textarea id="update-notes" rows="4" class="w-full px-3 py-2 border border-slate-300 rounded-lg" required>${update?.notes || ''}</textarea>
+                            </div>
+                            <button type="button" id="ai-summary-btn" class="w-full bg-indigo-100 text-indigo-700 font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-indigo-200">
+                                <i class="fas fa-magic"></i> Generate AI Summary
+                            </button>
+                            <div id="ai-spinner" class="text-center hidden"><i class="fas fa-spinner animate-spin text-sky-600"></i> Generating...</div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg">Save Update</button>
+                        </div>
+                    </form>`);
+                 },
+                 addEditTask(personId = null) {
+                    const peopleOptions = state.people.sort((a,b) => a.name.localeCompare(b.name)).map(p => 
+                        `<option value="${p.id}" ${personId === p.id ? 'selected' : ''}>${p.name}</option>`
+                    ).join('');
+                    
+                    const personSelect = personId === null ? `<div><label class="block text-sm font-medium text-slate-600 mb-1">For Person</label><select id="task-person-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg" required>${peopleOptions}</select></div>` : '';
+                    
+                    modalService.open(`<form id="task-form" class="p-6" data-person-id="${personId || ''}">
+                        <h3 class="text-xl font-bold mb-4">Create a Task</h3>
+                        <div class="space-y-4">
+                            ${personSelect}
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Description</label>
+                                <div class="relative">
+                                    <textarea id="task-description" class="w-full px-3 py-2 border border-slate-300 rounded-lg" rows="4" required></textarea>
+                                    <button type="button" id="ai-task-breakdown-btn" class="absolute bottom-2 right-2 bg-indigo-100 text-indigo-700 font-semibold py-1 px-3 rounded-full text-xs hover:bg-indigo-200" title="Breakdown Task">
+                                        ✨ Breakdown
+                                    </button>
+                                </div>
+                                <div id="ai-task-spinner" class="text-center hidden mt-2"><i class="fas fa-spinner animate-spin text-sky-600"></i> Thinking...</div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Due Date</label>
+                                <input type="date" id="task-due-date" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${new Date().toISOString().split('T')[0]}" required>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg">Add Task</button>
+                        </div>
+                    </form>`);
+                 },
+                 addEditMilestone(personId, milestone) { 
+                    const isEditing = !!milestone; 
+                    const types = ['Birthday', 'Anniversary', 'Baptism', 'Joined Church', 'Loss of Loved One']; 
+                    modalService.open(`<form id="milestone-form" class="p-6" data-person-id="${personId}" data-milestone-id="${milestone?.id || ''}">
+                        <h3 class="text-xl font-bold mb-4">${isEditing ? 'Edit' : 'Record'} Milestone</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Type</label>
+                                <select id="milestone-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    ${types.map(t => `<option value="${t}" ${isEditing && t === milestone.type ? 'selected': ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Date</label>
+                                <input type="date" id="milestone-date" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${milestone ? new Date(milestone.date).toISOString().split('T')[0] : ''}" required>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg">Save</button>
+                        </div>
+                    </form>`); 
+                 },
+                 addEditHospitalityEvent(event = null) {
+                    const isEditing = !!event; 
+                    const households = utils.getHouseholds(); 
+                    const date = event ? new Date(event.date) : new Date(); 
+                    const dateString = date.toISOString().split('T')[0];
+                    modalService.open(`<form id="hospitality-form" class="p-6" data-event-id="${event?.id || ''}">
+                        <h3 class="text-xl font-bold mb-4">${isEditing ? 'Edit' : 'Plan'} Hospitality Event</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Date</label>
+                                <input type="date" id="hospitality-date" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${dateString}" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Type</label>
+                                <select id="hospitality-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    <option value="Sunday Lunch" ${event?.type === 'Sunday Lunch' ? 'selected' : ''}>Sunday Lunch</option>
+                                    <option value="Weekday Visit" ${event?.type === 'Weekday Visit' ? 'selected' : ''}>Weekday Visit</option>
+                                    <option value="Home Visit" ${event?.type === 'Home Visit' ? 'selected' : ''}>Home Visit</option>
+                                    <option value="Other Event" ${event?.type === 'Other Event' ? 'selected' : ''}>Other Event</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Attendees (Households)</label>
+                                <div class="max-h-48 overflow-y-auto space-y-2 p-3 border rounded-lg">
+                                    ${households.map(h => `
+                                        <label class="flex items-center gap-3 p-1 rounded-md hover:bg-slate-100">
+                                            <input type="checkbox" name="attendees" value="${h.name}" class="h-4 w-4 rounded" ${isEditing && (event.attendee_families || []).includes(h.name) ? 'checked' : ''}>
+                                            <span>${h.name}</span>
+                                        </label>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-amber-500 text-white font-semibold py-2 px-5 rounded-lg">Save Event</button>
+                        </div>
+                    </form>`, 'lg');
+                 },
+                 editCalling(person) {
+                    modalService.open(`<form id="calling-form" class="p-6" data-person-id="${person.id}">
+                        <h3 class="text-xl font-bold mb-4">Edit Calling for ${person.name}</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-2">Spiritual Gifts</label>
+                                <div class="max-h-32 overflow-y-auto space-y-1 p-2 border rounded-lg">
+                                    ${state.spiritualGifts.map(g => `<label class="flex items-center gap-2 p-1"><input type="checkbox" name="gifts" value="${g}" ${(person.gifts || []).includes(g) ? 'checked' : ''}>${g}</label>`).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-2">Church Roles</label>
+                                <div class="max-h-32 overflow-y-auto space-y-1 p-2 border rounded-lg">
+                                    ${state.churchRoles.map(r => `<label class="flex items-center gap-2 p-1"><input type="checkbox" name="roles" value="${r}" ${(person.roles || []).includes(r) ? 'checked' : ''}>${r}</label>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg">Save Calling</button>
+                        </div>
+                    </form>`, 'lg');
+                 },
+                addEditPrayerRequest(personId, request) {
+                    const isEditing = !!request;
+                    modalService.open(`<form id="prayer-request-form" class="p-6" data-person-id="${personId}" data-pr-id="${request?.id || ''}">
+                        <h3 class="text-xl font-bold mb-4">${isEditing ? 'Edit' : 'Add'} Prayer Request</h3>
+                        <textarea id="prayer-request-text" class="w-full px-3 py-2 border border-slate-300 rounded-lg" rows="5" required>${request?.request || ''}</textarea>
+                        <div class="mt-6 flex justify-end"><button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg">Save Request</button></div>
+                    </form>`);
+                },
+                 confirm(title, message, onConfirm) { 
+                    modalService.open(`<div class="p-6 text-center">
+                        <div class="text-4xl text-amber-500 mb-4"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3 class="text-xl font-bold mb-2">${title}</h3>
+                        <p class="text-slate-500 mb-6">${message}</p>
+                        <div class="flex justify-center gap-4">
+                            <button type="button" class="cancel-confirm-btn bg-slate-200 text-slate-800 font-semibold py-2 px-6 rounded-lg">Cancel</button>
+                            <button type="button" class="confirm-btn bg-red-600 text-white font-semibold py-2 px-6 rounded-lg">Delete</button>
+                        </div>
+                    </div>`); 
+                    const confirmBtn = ui.modalContent.querySelector('.confirm-btn');
+                    const cancelBtn = ui.modalContent.querySelector('.cancel-confirm-btn');
+                    confirmBtn.onclick = () => { onConfirm(); modalService.close(); }; 
+                    cancelBtn.onclick = () => modalService.close(); 
+                 },
+                settings() {
+                    modalService.open(`<form id="settings-form" class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold">Settings</h3>
+                            <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-600">&times;</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="settings-schedule-url" class="block text-sm font-medium text-slate-600 mb-1">Preaching Schedule URL</label>
+                                <input type="url" id="settings-schedule-url" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${state.settings.scheduleUrl || ''}" placeholder="https://docs.google.com/...">
+                                <p class="text-xs text-slate-500 mt-1">Paste your published Google Doc link here.</p>
+                            </div>
+                            <div>
+                                <label for="settings-contact-pulse" class="block text-sm font-medium text-slate-600 mb-1">Default Contact Pulse (days)</label>
+                                <input type="number" id="settings-contact-pulse" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${state.settings.contactPulse || 30}">
+                                <p class="text-xs text-slate-500 mt-1">Default reminder time for new people.</p>
+                            </div>
+                            <div>
+                                <label for="settings-hospitality-pulse" class="block text-sm font-medium text-slate-600 mb-1">Default Hospitality Pulse (days)</label>
+                                <input type="number" id="settings-hospitality-pulse" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${state.settings.hospitalityPulse || 90}">
+                                <p class="text-xs text-slate-500 mt-1">Reminder time for hosting families.</p>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-sky-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-sky-700 transition">Save Settings</button>
+                        </div>
+                    </form>`);
+                },
+                viewSchedule() {
+                    const url = state.settings.scheduleUrl;
+                    if (!url) {
+                        modalService.open(`<div class="p-6 text-center">
+                            <div class="text-4xl text-sky-500 mb-4"><i class="fas fa-calendar-alt"></i></div>
+                            <h3 class="text-xl font-bold mb-2">No Schedule URL</h3>
+                            <p class="text-slate-500 mb-6">Please add your Google Doc URL in the Settings modal to view the schedule here.</p>
+                            <div class="flex justify-center gap-4">
+                                <button type="button" class="cancel-confirm-btn bg-slate-200 text-slate-800 font-semibold py-2 px-6 rounded-lg">Close</button>
+                                <button type="button" class="go-to-settings-btn bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg">Go to Settings</button>
+                            </div>
+                        </div>`);
+                        ui.modalContent.querySelector('.go-to-settings-btn').onclick = () => {
+                            modalService.close();
+                            modals.settings();
+                        };
+                        ui.modalContent.querySelector('.cancel-confirm-btn').onclick = () => modalService.close();
+                        return;
+                    }
+                    
+                    modalService.open(`<div class="flex justify-between items-center p-4 border-b border-slate-200">
+                                            <h3 class="text-xl font-bold">Preaching Schedule</h3>
+                                            <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-600">&times;</button>
+                                        </div>
+                                        <div id="schedule-container" class="flex-1">
+                                            <iframe id="schedule-iframe" src="${url}"></iframe>
+                                        </div>`, 'full');
+                },
+                // --- UPDATED: confirmImport with more info ---
+                confirmImport(people) {
+                    modalService.open(`<div class="p-6">
+                        <h3 class="text-xl font-bold mb-4">Confirm Import</h3>
+                        <p class="text-slate-500 mb-4">Found ${people.length} contact(s). Would you like to import them?</p>
+                        <ul class="max-h-60 overflow-y-auto space-y-2 p-3 border rounded-lg mb-6">
+                            ${people.map(p => `
+                                <li class="flex items-center gap-3">
+                                    ${p.photoURL ? `<img src="${p.photoURL}" class="avatar avatar-sm">` : `<div class="avatar avatar-sm bg-slate-200 text-slate-500">${utils.generateInitials(p.name)}</div>`}
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-700">${p.name}</p>
+                                        ${p.bday ? `<p class="text-xs text-pink-600"><i class="fas fa-birthday-cake fa-fw mr-1"></i> ${p.bday}</p>` : ''}
+                                        ${p.anniversary ? `<p class="text-xs text-rose-600"><i class="fas fa-heart fa-fw mr-1"></i> ${p.anniversary}</p>` : ''}
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <div class="flex justify-end gap-4">
+                            <button type="button" class="cancel-confirm-btn bg-slate-200 text-slate-800 font-semibold py-2 px-6 rounded-lg">Cancel</button>
+                            <button type="button" id="confirm-import-execute-btn" class="bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg">Import</button>
+                        </div>
+                    </div>`);
+                    
+                    ui.modalContent.querySelector('#confirm-import-execute-btn').onclick = () => {
+                        storageService.importPhoneContacts(people);
+                        modalService.close();
+                        utils.showToast(`${people.length} contact(s) imported!`);
+                    };
+                    ui.modalContent.querySelector('.cancel-confirm-btn').onclick = () => modalService.close();
+                },
+                showConversationStarters(person) {
+                    modalService.open(`<div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Starters for ${person.name}</h3>
+                            <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-600">&times;</button>
+                        </div>
+                        <div id="convo-starter-content">
+                            <div class="flex justify-center items-center py-10">
+                                <i class="fas fa-spinner animate-spin text-3xl text-sky-600"></i>
+                            </div>
+                        </div>
+                    </div>`);
+                    
+                    (async () => {
+                        const contentEl = document.getElementById('convo-starter-content');
+                        if (!contentEl) return;
+                        
+                        const result = await utils.getConversationStarters(person);
+                        
+                        if (result.text.includes("Error generating response")) {
+                            contentEl.innerHTML = `<p class="text-center text-red-500 py-10">${result.text}</p>`;
+                        } else {
+                            const starters = result.text.split('\n').filter(s => s.trim() !== '');
+                            contentEl.innerHTML = `<ul class="space-y-3 list-disc list-inside text-slate-700">
+                                ${starters.map(s => `<li>${s.replace(/^\d+\.\s*/, '')}</li>`).join('')}
+                            </ul>`;
+                        }
+                    })();
+                },
+                // --- REMOVED: addEditSermon modal ---
+                
+                // --- NEW: showPrayerSummary modal ---
+                showPrayerSummary() {
+                     modalService.open(`<div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Prayer Request Summary</h3>
+                            <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-600">&times;</button>
+                        </div>
+                        <div id="prayer-summary-content">
+                            <div class="flex justify-center items-center py-10">
+                                <i class="fas fa-spinner animate-spin text-3xl text-sky-600"></i>
+                            </div>
+                        </div>
+                    </div>`);
+                    
+                    (async () => {
+                        const contentEl = document.getElementById('prayer-summary-content');
+                        if (!contentEl) return;
+                        
+                        const result = await utils.getPrayerSummary();
+                        
+                        if (result.text.includes("Error generating response")) {
+                            contentEl.innerHTML = `<p class="text-center text-red-500 py-10">${result.text}</p>`;
+                        } else {
+                            // Format as a list
+                            const summaryPoints = result.text.split('\n').filter(s => s.trim() !== '');
+                            contentEl.innerHTML = `<ul class="space-y-3 list-disc list-inside text-slate-700">
+                                ${summaryPoints.map(s => `<li>${s.replace(/^\*|^\d+\.\s*/, '')}</li>`).join('')}
+                            </ul>`;
+                        }
+                    })();
+                }
+            };
+            
+            // --- DATA STORAGE SERVICE (LocalStorage) ---
+            const storageService = {
+                STORAGE_KEY: 'shepherds-hand-data',
+                _data: {},
+                _subscribers: [],
+
+                _commit() {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._data));
+                    Object.assign(state, this._data);
+                    this._subscribers.forEach(callback => callback());
+                },
+                
+                _rehydrateDates(obj) {
+                    if (obj.createdAt) obj.createdAt = new Date(obj.createdAt);
+                    if (obj.dueDate) obj.dueDate = new Date(obj.dueDate);
+                    if (obj.date) obj.date = new Date(obj.date); // For milestones
+                    if (obj.completedDate) obj.completedDate = new Date(obj.completedDate);
+                    // Note: Sermon dates are handled by their own removal
+                    return obj;
+                },
+
+                init() {
+                    let rawData = localStorage.getItem(this.STORAGE_KEY);
+                    const defaultSettings = { scheduleUrl: '', contactPulse: 30, hospitalityPulse: 90 };
+                    
+                    if (rawData) {
+                        this._data = JSON.parse(rawData);
+                        Object.keys(this._data).forEach(key => {
+                            if (Array.isArray(this._data[key])) {
+                                this._data[key] = this._data[key].map(this._rehydrateDates);
+                            }
+                        });
+                        if (this._data.lastBackup) {
+                            this._data.lastBackup = new Date(this._data.lastBackup);
+                        }
+                        this._data.settings = { ...defaultSettings, ...(this._data.settings || {}) };
+                        // UPDATED: Ensure photoURL exists
+                        this._data.people = this._data.people.map(p => ({ keyInfo: '', gender: 'Unspecified', photoURL: null, ...p }));
+                        // REMOVED: this._data.sermons
+                        delete this._data.sermons; // Clean up old data
+                    } else {
+                        // UPDATED: Removed sermons from default data
+                        this._data = { people: [], tasks: [], updates: [], milestones: [], hospitality: [], prayerRequests: [], lastBackup: null, settings: defaultSettings }; 
+                        this.seedSampleDataIfNeeded(); 
+                        this._commit(); 
+                    }
+                    Object.assign(state, this._data); 
+                },
+                
+                subscribe(callback) { this._subscribers.push(callback); },
+                _generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); },
+                getAllData() { return this._data; },
+                
+                // --- UPDATED: savePerson (with photoURL) ---
+                savePerson(form) {
+                    const personId = form.dataset.personId;
+                    const previewAvatar = ui.modalContent.querySelector('#modal-avatar-preview img, #modal-avatar-preview div');
+                    const photoURL = previewAvatar.tagName === 'IMG' ? previewAvatar.src : (personId ? state.people.find(p=>p.id === personId).photoURL : null); // Keep existing photo if not changed
+
+                    const data = {
+                        name: form.querySelector('#person-name').value,
+                        family: form.querySelector('#person-family').value,
+                        phone: form.querySelector('#person-phone').value,
+                        email: form.querySelector('#person-email').value,
+                        pulse: parseInt(form.querySelector('#person-pulse').value, 10) || state.settings.contactPulse,
+                        gender: form.querySelector('#person-gender').value,
+                        keyInfo: form.querySelector('#person-key-info').value.trim(),
+                        photoURL: photoURL // Save the new photo URL
+                    };
+                    if (personId) { 
+                        const index = this._data.people.findIndex(p => p.id === personId);
+                        if (index > -1) this._data.people[index] = { ...this._data.people[index], ...data };
+                        utils.showToast('Person updated!');
+                    } else { 
+                        this._data.people.push({ ...data, id: this._generateId(), createdAt: new Date().toISOString() });
+                        utils.showToast('Person added!');
+                    }
+                    this._commit();
+                    modalService.close();
+                },
+                
+                // --- UPDATED: updatePersonDetailsFromView (with photoURL) ---
+                updatePersonDetailsFromView(personId, photoURL = null) {
+                    const index = this._data.people.findIndex(p => p.id === personId);
+                    if (index === -1) return;
+                    
+                    const person = this._data.people[index];
+
+                    const updatedData = {
+                        name: document.getElementById('person-detail-name').value,
+                        family: document.getElementById('person-detail-family').value,
+                        phone: document.getElementById('person-detail-phone').value,
+                        email: document.getElementById('person-detail-email').value,
+                        pulse: parseInt(document.getElementById('person-detail-pulse').value, 10) || state.settings.contactPulse,
+                        gender: document.getElementById('person-detail-gender').value,
+                        keyInfo: document.getElementById('person-detail-key-info').value.trim(),
+                        // If photoURL is passed (from file upload), use it. Otherwise, keep the existing one.
+                        photoURL: photoURL !== null ? photoURL : person.photoURL
+                    };
+                    
+                    this._data.people[index] = { ...person, ...updatedData };
+                    this._commit();
+                    utils.showToast('Details updated!');
+                },
+                
+                deletePerson(id) {
+                    this._data.people = this._data.people.filter(p => p.id !== id);
+                    this._data.updates = this._data.updates.filter(u => u.personId !== id);
+                    this._data.tasks = this._data.tasks.filter(t => t.personId !== id);
+                    this._data.milestones = this._data.milestones.filter(m => m.personId !== id);
+                    this._data.prayerRequests = this._data.prayerRequests.filter(pr => pr.personId !== id);
+                    this._commit();
+                    utils.showToast('Person and all associated data deleted.');
+                    appController.navigateTo('people');
+                },
+                
+                // --- UPDATED: importPhoneContacts (with milestones/gender) ---
+                importPhoneContacts(people) {
+                    let importedCount = 0;
+                    people.forEach(person => {
+                        const exists = this._data.people.some(p => p.name === person.name);
+                        if (!exists) {
+                            const newId = this._generateId();
+                            this._data.people.push({
+                                name: person.name,
+                                phone: person.phone,
+                                email: person.email,
+                                family: person.family,
+                                photoURL: person.photoURL, // Save the base64 URL
+                                id: newId,
+                                createdAt: new Date().toISOString(),
+                                pulse: this._data.settings.contactPulse,
+                                gender: utils.guessGender(person.name), // Guess gender
+                                keyInfo: 'Imported from phone contacts.',
+                                gifts: [],
+                                roles: []
+                            });
+                            
+                            // NEW: Auto-create milestones
+                            if (person.bday) {
+                                this._data.milestones.push({
+                                    id: this._generateId(),
+                                    personId: newId,
+                                    type: 'Birthday',
+                                    date: new Date(person.bday + 'T00:00:00').toISOString(), // Assumes YYYY-MM-DD
+                                    createdAt: new Date().toISOString()
+                                });
+                            }
+                            if (person.anniversary) {
+                                 this._data.milestones.push({
+                                    id: this._generateId(),
+                                    personId: newId,
+                                    type: 'Anniversary',
+                                    date: new Date(person.anniversary + 'T00:00:00').toISOString(), // Assumes YYYY-MM-DD
+                                    createdAt: new Date().toISOString()
+                                });
+                            }
+                            
+                            importedCount++;
+                        }
+                    });
+                    if (importedCount > 0) {
+                        this._commit();
+                    }
+                    console.log(`Imported ${importedCount} new contacts.`);
+                },
+
+                saveUpdate(form) {
+                    const updateId = form.dataset.updateId;
+                    const personId = form.dataset.personId || form.querySelector('#update-person-id')?.value;
+                    if (!personId) { utils.showToast('Please select a person.'); return; }
+                    const data = {
+                        type: form.querySelector('#update-type').value,
+                        notes: form.querySelector('#update-notes').value.trim(),
+                        personId: personId
+                    };
+                    if (updateId) { 
+                        const index = this._data.updates.findIndex(u => u.id === updateId);
+                        if (index > -1) this._data.updates[index] = { ...this._data.updates[index], ...data };
+                        utils.showToast('Update saved!');
+                    } else { 
+                        this._data.updates.push({ ...data, id: this._generateId(), createdAt: new Date().toISOString() });
+                        utils.showToast('Update logged!');
+                    }
+                    this._commit();
+                    modalService.close();
+                },
+                deleteUpdate(id) { 
+                    this._data.updates = this._data.updates.filter(u => u.id !== id);
+                    this._commit();
+                    utils.showToast('Update deleted.'); 
+                },
+                saveTask(form) {
+                    const personId = form.dataset.personId || form.querySelector('#task-person-id')?.value;
+                    if (!personId) { utils.showToast('Please select a person.'); return; }
+                    const newTask = { 
+                        id: this._generateId(), personId, 
+                        description: form.querySelector('#task-description').value, 
+                        dueDate: new Date(form.querySelector('#task-due-date').value + 'T00:00:00').toISOString(), 
+                        completed: false, createdAt: new Date().toISOString() 
+                    };
+                    this._data.tasks.push(newTask);
+                    this._commit();
+                    utils.showToast('Task added!'); 
+                    modalService.close(); 
+                },
+                toggleTask(id) { 
+                    const index = this._data.tasks.findIndex(t => t.id === id);
+                    if (index > -1) this._data.tasks[index].completed = !this._data.tasks[index].completed;
+                    this._commit();
+                },
+                deleteTask(id) { 
+                    this._data.tasks = this._data.tasks.filter(t => t.id !== id);
+                    this._commit();
+                    utils.showToast('Task deleted.'); 
+                },
+                saveMilestone(form) {
+                    const milestoneId = form.dataset.milestoneId;
+                    const personId = form.dataset.personId;
+                    const data = {
+                        type: form.querySelector('#milestone-type').value,
+                        date: new Date(form.querySelector('#milestone-date').value + 'T00:00:00').toISOString(),
+                        personId: personId
+                    };
+                    if(milestoneId) { 
+                        const index = this._data.milestones.findIndex(m => m.id === milestoneId);
+                        if (index > -1) this._data.milestones[index] = { ...this._data.milestones[index], ...data };
+                        utils.showToast('Milestone updated!');
+                    } else { 
+                        this._data.milestones.push({ ...data, id: this._generateId(), createdAt: new Date().toISOString() });
+                        utils.showToast('Milestone saved!');
+                    }
+                    this._commit();
+                    modalService.close();
+                },
+                deleteMilestone(id) { 
+                    this._data.milestones = this._data.milestones.filter(m => m.id !== id);
+                    this._commit();
+                    utils.showToast('Milestone deleted.'); 
+                },
+                logContact(personId, type, notes) {
+                    const newUpdate = {
+                        id: this._generateId(), personId, type,
+                        notes: notes.trim(),
+                        createdAt: new Date().toISOString()
+                    };
+                    this._data.updates.push(newUpdate);
+                    this._commit();
+                    utils.showToast('Contact logged!');
+                    modalService.close();
+                },
+                saveHospitalityEvent(form, eventId = null) {
+                    const id = eventId || form.dataset.eventId;
+                    const data = {
+                        date: new Date(form.querySelector('#hospitality-date, #quick-hospitality-date').value + 'T00:00:00').toISOString(),
+                        type: form.querySelector('#hospitality-type, #quick-hospitality-type').value,
+                        attendee_families: form.dataset.familyName 
+                                            ? [form.dataset.familyName] 
+                                            : Array.from(form.querySelectorAll('input[name="attendees"]:checked')).map(el => el.value)
+                    };
+                    let eventIdentifier = id;
+                    if (id) { 
+                        const index = this._data.hospitality.findIndex(h => h.id === id);
+                        if (index > -1) this._data.hospitality[index] = { ...this._data.hospitality[index], ...data };
+                        utils.showToast('Event updated!');
+                    } else { 
+                        eventIdentifier = this._generateId();
+                        this._data.hospitality.push({ ...data, id: eventIdentifier, createdAt: new Date().toISOString(), journal: null });
+                        utils.showToast('Event saved!');
+                    }
+                    this._commit();
+                    modalService.close();
+                    return eventIdentifier; 
+                },
+                deleteHospitalityEvent(id) { 
+                    this._data.hospitality = this._data.hospitality.filter(h => h.id !== id);
+                    this._commit();
+                    utils.showToast('Event deleted.'); 
+                },
+                saveHospitalityJournal(eventId, journal) {
+                    const index = this._data.hospitality.findIndex(h => h.id === eventId);
+                    if (index === -1) return;
+                    const event = this._data.hospitality[index];
+                    event.journal = journal.trim();
+                    const attendeeFamilies = event.attendee_families || [];
+                    const allPeople = this._data.people;
+                    
+                    attendeeFamilies.forEach(family => {
+                        const members = allPeople.filter(p => p.family === family || p.name === family);
+                        members.forEach(member => {
+                            this._data.updates.push({
+                                id: this._generateId(), personId: member.id, type: 'Hospitality',
+                                notes: `Attended ${event.type} with ${attendeeFamilies.join(', ')}.\n\nJournal:\n${journal}`,
+                                createdAt: new Date(event.date).toISOString() 
+                            });
+                        });
+                    });
+                    this._commit();
+                    utils.showToast('Journal saved and updates logged!'); 
+                    modalService.close(); 
+                },
+                saveCalling(personId, form) {
+                    const index = this._data.people.findIndex(p => p.id === personId);
+                    if (index === -1) return;
+                    const data = {
+                        gifts: Array.from(form.querySelectorAll('input[name="gifts"]:checked')).map(el => el.value),
+                        roles: Array.from(form.querySelectorAll('input[name="roles"]:checked')).map(el => el.value),
+                    };
+                    this._data.people[index] = { ...this._data.people[index], ...data };
+                    this._commit();
+                    utils.showToast('Calling info saved!');
+                    modalService.close();
+                },
+                savePrayerRequest(form) {
+                    const personId = form.dataset.personId;
+                    const prId = form.dataset.prId;
+                    const data = { request: form.querySelector('#prayer-request-text').value.trim(), personId };
+                    if(prId) { 
+                        const index = this._data.prayerRequests.findIndex(pr => pr.id === prId);
+                        if (index > -1) this._data.prayerRequests[index] = { ...this._data.prayerRequests[index], ...data };
+                        utils.showToast('Prayer request updated.');
+                    } else { 
+                        this._data.prayerRequests.push({ ...data, id: this._generateId(), status: 'Active', createdAt: new Date().toISOString() });
+                        utils.showToast('Prayer request added.');
+                    }
+                    this._commit();
+                    modalService.close();
+                },
+                togglePrayerStatus(id) {
+                    const index = this._data.prayerRequests.findIndex(pr => pr.id === id);
+                    if(index > -1) {
+                        const req = this._data.prayerRequests[index];
+                        req.status = req.status === 'Active' ? 'Answered' : 'Active';
+                        this._commit();
+                    }
+                },
+                deletePrayerRequest(id) { 
+                    this._data.prayerRequests = this._data.prayerRequests.filter(pr => pr.id !== id);
+                    this._commit();
+                    utils.showToast('Request removed.'); 
+                },
+                // --- REMOVED: saveSermon and deleteSermon ---
+                
+                saveSettings(form) {
+                    const settings = {
+                        scheduleUrl: form.querySelector('#settings-schedule-url').value,
+                        contactPulse: parseInt(form.querySelector('#settings-contact-pulse').value, 10) || 30,
+                        hospitalityPulse: parseInt(form.querySelector('#settings-hospitality-pulse').value, 10) || 90,
+                    };
+                    this._data.settings = settings;
+                    this._commit();
+                    utils.showToast('Settings saved!');
+                    modalService.close();
+                },
+                exportData() { return JSON.stringify(this._data, null, 2); },
+                importData(jsonString) {
+                    try {
+                        const parsed = JSON.parse(jsonString);
+                        if (parsed && Array.isArray(parsed.people)) {
+                            this._data = parsed;
+                            Object.keys(this._data).forEach(key => {
+                                if (Array.isArray(this._data[key])) this._data[key] = this._data[key].map(this._rehydrateDates);
+                            });
+                            if (this._data.lastBackup) this._data.lastBackup = new Date(this._data.lastBackup);
+                            const defaultSettings = { scheduleUrl: '', contactPulse: 30, hospitalityPulse: 90 };
+                            this._data.settings = { ...defaultSettings, ...(this._data.settings || {}) };
+                            // UPDATED: Ensure new fields on import
+                            this._data.people = this._data.people.map(p => ({ keyInfo: '', gender: 'Unspecified', photoURL: null, ...p }));
+                            delete this._data.sermons; // Clean up
+                            
+                            this._commit();
+                            return true;
+                        }
+                    } catch (e) { console.error("Failed to parse import file:", e); }
+                    return false;
+                },
+                recordBackup() {
+                    this._data.lastBackup = new Date().toISOString();
+                    this._commit(); 
+                },
+                // --- UPDATED: seedSampleData ---
+                seedSampleDataIfNeeded() {
+                    if (this._data.people.length > 0) return;
+                    utils.showToast('Setting up sample ministry...');
+                    const today = new Date();
+                    const personData = [
+                        { id: this._generateId(), name: "John Smith", family: "Smith Family", phone: "15551234567", email: "john.smith@example.com", gifts: ["Teaching"], roles: ["Small Group Leader"], pulse: 30, gender: "Male", keyInfo: "Studying for seminary.", createdAt: today.toISOString(), photoURL: null },
+                        { id: this._generateId(), name: "Jane Smith", family: "Smith Family", phone: "15551234568", email: "jane.smith@example.com", gifts: ["Hospitality"], roles: ["Meal Train Coordinator"], pulse: 30, gender: "Female", keyInfo: "Organizes the new mom meals.", createdAt: today.toISOString(), photoURL: null },
+                        { id: this._generateId(), name: "David Miller", family: "David Miller", phone: "15552345678", email: "david.miller@example.com", gifts: ["Helps"], roles: ["Usher"], pulse: 45, gender: "Male", keyInfo: "", createdAt: today.toISOString(), photoURL: null },
+                        { id: this._generateId(), name: "Maria Garcia", family: "Garcia Family", phone: "15553456789", email: "maria.garcia@example.com", gifts: ["Encouragement"], roles: [], pulse: 30, gender: "Female", keyInfo: "Looking for a new job.", createdAt: today.toISOString(), photoURL: null },
+                    ];
+                    this._data.people = personData;
+                    this._data.updates = [
+                        { id: this._generateId(), personId: personData[1].id, type: "Meeting", notes: "Met for coffee to discuss the meal train ministry.", createdAt: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+                        { id: this._generateId(), personId: personData[2].id, type: "Phone Call", notes: "Checked in with David. He's doing well.", createdAt: new Date(today.getTime() - 40 * 24 * 60 * 60 * 1000).toISOString() } 
+                    ];
+                    this._data.tasks = [
+                        { id: this._generateId(), personId: personData[0].id, description: "Call John about small group curriculum", dueDate: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(), completed: false, createdAt: today.toISOString() }
+                    ];
+                    this._data.milestones = [
+                        { id: this._generateId(), personId: personData[0].id, type: "Birthday", date: new Date('1985-10-15T00:00:00').toISOString(), createdAt: today.toISOString() }
+                    ];
+                    this._data.hospitality = [
+                        { id: this._generateId(), type: "Sunday Lunch", date: new Date(today.getTime() - 12 * 24 * 60 * 60 * 1000).toISOString(), attendee_families: ["Smith Family", "Garcia Family"], journal: "Great time together after service.", createdAt: today.toISOString() }
+                    ];
+                    this._data.prayerRequests = [
+                        { id: this._generateId(), personId: personData[3].id, request: "Prayer for upcoming job interview on Wednesday.", status: 'Active', createdAt: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString() }
+                    ];
+                    // REMOVED: Sermon seed data
+                }
+            };
+
+            // --- MAIN APP CONTROLLER ---
+            const appController = {
+                init() {
+                    storageService.subscribe(() => this.refreshCurrentView());
+                    storageService.init();
+                    state.dataLoaded = true;
+                    this.setupEventListeners();
+                    this.navigateTo('dashboard'); 
+                },
+                
+                setupEventListeners() {
+                    ui.navButtons.forEach(btn => btn.addEventListener('click', () => this.navigateTo(btn.dataset.view)));
+                    ui.backupBtn.addEventListener('click', () => this.backupData());
+                    ui.restoreBtn.addEventListener('click', () => ui.restoreFileInput.click());
+                    ui.restoreFileInput.addEventListener('change', e => this.restoreData(e));
+                    ui.settingsBtn.addEventListener('click', () => modals.settings()); 
+                    
+                    ui.mainContent.addEventListener('click', async e => {
+                        const eventMap = {
+                             '.person-item': el => this.navigateTo('person-detail', el.closest('[data-person-id]').dataset.personId),
+                             '#back-to-people': () => this.navigateTo('people'),
+                             '#add-person-btn': () => modals.addEditPerson(),
+                             '#quick-add-person': () => modals.addEditPerson(),
+                             '#quick-add-task': () => modals.addEditTask(),
+                             '#quick-add-update': () => modals.addEditUpdate(),
+                             '#import-contacts-btn': () => this.importContacts(),
+                             '#save-person-details-btn': el => storageService.updatePersonDetailsFromView(state.selectedPerson.id),
+                             '#delete-person-btn': el => {
+                                const personId = el.dataset.personId;
+                                const person = state.people.find(p => p.id === personId);
+                                if (person) modals.confirm(`Delete ${person.name}?`, 'This will permanently delete their profile and all associated data.', () => storageService.deletePerson(personId));
+                             },
+                             '#dashboard-backup-btn': () => this.backupData(),
+                             '#view-schedule-btn': () => modals.viewSchedule(), 
+                             '#view-settings-btn': () => modals.settings(), 
+                             '.add-update-btn': el => modals.addEditUpdate(el.dataset.personId),
+                             '.edit-update-btn': el => modals.addEditUpdate(state.selectedPerson.id, state.updates.find(u => u.id === el.dataset.updateId)),
+                             '.delete-update-btn': el => modals.confirm('Delete Update?', 'This action cannot be undone.', () => storageService.deleteUpdate(el.dataset.updateId)),
+                             '.add-task-btn': el => modals.addEditTask(el.dataset.personId),
+                             '.toggle-task-btn': el => storageService.toggleTask(el.dataset.taskId),
+                             '.delete-task-btn': el => modals.confirm('Delete Task?', 'This action cannot be undone.', () => storageService.deleteTask(el.dataset.taskId)),
+                             '.add-milestone-btn': el => modals.addEditMilestone(el.dataset.personId),
+                             '.log-hospitality-btn': el => modals.logQuickHospitality(state.selectedPerson),
+                             '.edit-milestone-btn': el => modals.addEditMilestone(state.selectedPerson.id, state.milestones.find(m => m.id === el.dataset.milestoneId)),
+                             '.delete-milestone-btn': el => modals.confirm('Delete Milestone?', 'This action cannot be undone.', () => storageService.deleteMilestone(el.dataset.milestoneId)),
+                             '.person-tab-btn': el => this.switchPersonTab(el.dataset.tab),
+                             '.view-tab-btn': el => { 
+                                const view = state.currentView;
+                                const tab = el.dataset.tab;
+                                if (view === 'people') state.peopleViewTab = tab;
+                                else if (view === 'hospitality') state.hospitalityViewTab = tab;
+                                else if (view === 'outreach') state.outreachViewTab = tab;
+                                this.refreshCurrentView();
+                             },
+                             '.log-contact-btn': el => modals.logContact(el.dataset.personId),
+                             // --- UPDATED: WhatsApp Button Listener ---
+                             '.contact-via-whatsapp-btn': el => {
+                                 window.open(el.dataset.href, '_blank');
+                                 // Automatically open the log modal, pre-filled
+                                 modals.logContact(el.dataset.personId, 'WhatsApp Chat');
+                             },
+                             '#add-hospitality-btn': () => modals.addEditHospitalityEvent(),
+                             '.edit-hospitality-btn': el => modals.addEditHospitalityEvent(state.hospitality.find(h => h.id === el.dataset.eventId)),
+                             '.delete-hospitality-btn': el => modals.confirm('Delete Event?', 'This will be removed.', () => storageService.deleteHospitalityEvent(el.dataset.eventId)),
+                             '.log-hospitality-journal-btn': el => modals.logHospitalityJournal(el.dataset.eventId),
+                             '.edit-calling-btn': el => modals.editCalling(state.people.find(p => p.id === el.dataset.personId)),
+                             '.add-prayer-request-btn': el => modals.addEditPrayerRequest(el.dataset.personId),
+                             '.edit-prayer-request-btn': el => modals.addEditPrayerRequest(state.selectedPerson.id, state.prayerRequests.find(pr => pr.id === el.dataset.prId)),
+                             '.toggle-prayer-status-btn': el => storageService.togglePrayerStatus(el.dataset.prId),
+                             '.delete-prayer-request-btn': el => modals.confirm('Delete Request?', 'This cannot be undone.', () => storageService.deletePrayerRequest(el.dataset.prId)),
+                             '.ai-convo-starter-btn': el => {
+                                const personId = el.dataset.personId;
+                                const person = state.people.find(p => p.id === personId);
+                                if(person) modals.showConversationStarters(person);
+                             },
+                             // --- UPDATED: Sermon illustration finder ---
+                             '#get-illustration-btn': async el => {
+                                const topic = el.closest('.flex').querySelector('#sermon-topic-input').value;
+                                if (!topic.trim()) { utils.showToast("Please enter a sermon point."); return; }
+                                const outputEl = document.getElementById('illustration-output');
+                                outputEl.innerHTML = `<div class="flex justify-center items-center py-10"><i class="fas fa-spinner animate-spin text-3xl text-sky-600"></i></div>`;
+                                const result = await utils.getSermonIllustration(topic);
+                                if (result.text.includes("Error generating response") || result.text.includes("blocked by the safety filter")) {
+                                    outputEl.innerHTML = `<p class="text-center text-red-500 py-10">${result.text}</p>`;
+                                } else {
+                                    outputEl.innerHTML = render._buildResourceCards(result.text);
+                                }
+                             },
+                             '.copy-card-btn': el => {
+                                const targetId = el.dataset.clipboardTargetId;
+                                const contentEl = document.getElementById(targetId);
+                                if (!contentEl) return;
+                                this.copyTextToClipboard(contentEl.innerText, el);
+                             },
+                             // --- NEW: Prayer Summary Listener ---
+                             '#summarize-prayers-btn': () => modals.showPrayerSummary(),
+                             // --- NEW: Change Photo Listener (on detail page) ---
+                             '#change-photo-btn': () => {
+                                document.getElementById('photo-file-input').click();
+                             },
+                        };
+                        for (const selector in eventMap) { 
+                            const el = e.target.closest(selector); 
+                            if (el) { eventMap[selector](el); break; } 
+                        }
+                    });
+                    
+                    // --- NEW: Listener for photo file input (on detail page) ---
+                    ui.mainContent.addEventListener('change', async e => {
+                        if (e.target.id === 'photo-file-input') {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            try {
+                                const photoURL = await utils.resizeImage(file, 200, 200);
+                                const avatarEl = ui.mainContent.querySelector('#change-photo-btn');
+                                avatarEl.innerHTML = `<img src="${photoURL}" class="avatar-lg" alt="New Photo">`;
+                                // Immediately save the new photo URL
+                                storageService.updatePersonDetailsFromView(state.selectedPerson.id, photoURL);
+                                utils.showToast("Photo updated!");
+                            } catch (err) {
+                                console.error("Error resizing image:", err);
+                                utils.showToast("Could not update photo.");
+                            }
+                        }
+                    });
+
+                    ui.modalContainer.addEventListener('click', e => { 
+                        if (e.target === ui.modalContainer || e.target.closest('.close-modal-btn')) modalService.close(); 
+                    });
+                    
+                    ui.modalContent.addEventListener('submit', async e => {
+                        e.preventDefault(); const form = e.target;
+                        if(form.id === 'person-form') storageService.savePerson(form);
+                        if(form.id === 'update-form') storageService.saveUpdate(form);
+                        if(form.id === 'task-form') storageService.saveTask(form);
+                        if(form.id === 'log-contact-form') storageService.logContact(form.dataset.personId, form.querySelector('#update-type').value, form.querySelector('#update-notes').value); 
+                        if(form.id === 'hospitality-form') storageService.saveHospitalityEvent(form);
+                        if(form.id === 'quick-hospitality-form') {
+                            const newEventId = storageService.saveHospitalityEvent(form);
+                            if (newEventId) {
+                                const newEvent = state.hospitality.find(h => h.id === newEventId);
+                                modals.logHospitalityJournal(newEvent.id);
+                            }
+                        }
+                        if(form.id === 'hospitality-journal-form') storageService.saveHospitalityJournal(form.dataset.eventId, form.querySelector('#hospitality-journal').value); 
+                        if(form.id === 'calling-form') storageService.saveCalling(form.dataset.personId, form); 
+                        if(form.id === 'prayer-request-form') storageService.savePrayerRequest(form); 
+                        if(form.id === 'settings-form') storageService.saveSettings(form);
+                        // REMOVED: sermon-form
+                    });
+                    
+                    ui.modalContent.addEventListener('click', async e => {
+                        // --- NEW: Change Photo Listeners (in modal) ---
+                        if(e.target.closest('#modal-avatar-preview')) {
+                            ui.modalContent.querySelector('#modal-photo-input').click();
+                        }
+                        if(e.target.closest('#remove-photo-btn')) {
+                            const previewEl = ui.modalContent.querySelector('#modal-avatar-preview');
+                            const personId = ui.modalContent.querySelector('form').dataset.personId;
+                            const person = state.people.find(p => p.id === personId) || { name: 'New' };
+                            previewEl.innerHTML = `<div class="avatar-lg bg-sky-200 text-sky-700">${utils.generateInitials(person.name)}</div>`;
+                            // Immediately remove from storage
+                            if (personId) {
+                                const index = state.people.findIndex(p => p.id === personId);
+                                if (index > -1) {
+                                    state.people[index].photoURL = null;
+                                    storageService._commit();
+                                }
+                            }
+                            e.target.closest('#remove-photo-btn').remove(); // Remove the button itself
+                        }
+
+                        // --- AI Buttons ---
+                        if(e.target.closest('#ai-summary-btn')) {
+                            const btn = e.target.closest('#ai-summary-btn');
+                            const notesEl = ui.modalContent.querySelector('#update-notes');
+                            const spinner = ui.modalContent.querySelector('#ai-spinner');
+                            btn.classList.add('hidden');
+                            spinner.classList.remove('hidden');
+                            const result = await utils.getAISummary(notesEl.value);
+                            notesEl.value = result.text; 
+                            spinner.classList.add('hidden');
+                            btn.classList.remove('hidden');
+                        }
+                        
+                        if(e.target.closest('#ai-task-breakdown-btn')) {
+                            const btn = e.target.closest('#ai-task-breakdown-btn');
+                            const descriptionEl = ui.modalContent.querySelector('#task-description');
+                            const spinner = ui.modalContent.querySelector('#ai-task-spinner');
+                            
+                            const taskText = descriptionEl.value;
+                            if (!taskText.trim()) {
+                                utils.showToast("Please enter a task description first.");
+                                return;
+                            }
+                            
+                            btn.classList.add('hidden');
+                            spinner.classList.remove('hidden');
+                            
+                            const result = await utils.getTaskBreakdown(taskText);
+                            
+                            if (!result.text.includes("Error generating response")) {
+                                descriptionEl.value += `\n\nSub-tasks:\n${result.text}`;
+                            } else {
+                                utils.showToast("Could not break down task.");
+                            }
+                            
+                            spinner.classList.add('hidden');
+                        }
+                    });
+                    
+                    // --- NEW: Listener for photo file input (in modal) ---
+                    ui.modalContent.addEventListener('change', async e => {
+                        if (e.target.id === 'modal-photo-input') {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            try {
+                                const photoURL = await utils.resizeImage(file, 200, 200);
+                                const previewEl = ui.modalContent.querySelector('#modal-avatar-preview');
+                                previewEl.innerHTML = `<img src="${photoURL}" class="avatar-lg" alt="New Photo">`;
+                                
+                                // Add remove button if it doesn't exist
+                                const form = ui.modalContent.querySelector('form');
+                                if (form.dataset.personId && !ui.modalContent.querySelector('#remove-photo-btn')) {
+                                    const button = document.createElement('button');
+                                    button.type = 'button';
+                                    button.id = 'remove-photo-btn';
+                                    button.className = 'text-xs text-red-500 hover:underline mt-1';
+                                    button.textContent = 'Remove Photo';
+                                    previewEl.after(button);
+                                }
+                            } catch (err) {
+                                console.error("Error resizing image:", err);
+                                utils.showToast("Could not update photo.");
+                            }
+                        }
+                    });
+                },
+                
+                // --- UPDATED: importContacts (to handle more props) ---
+                async importContacts() {
+                    if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                        utils.showToast('Contact Import is not supported on this device.');
+                        return;
+                    }
+                    try {
+                        // UPDATED: Request icon, bday, and anniversary
+                        const props = ['name', 'tel', 'email', 'icon', 'bday', 'anniversary'];
+                        const contacts = await navigator.contacts.select(props, { multiple: true });
+                        if (contacts.length === 0) return;
+                        
+                        // UPDATED: Must be async to handle image conversion
+                        const newPeople = await Promise.all(contacts.map(async c => {
+                            let photoURL = null;
+                            if (c.icon && c.icon[0]) {
+                                // Convert blob to base64 data URL
+                                photoURL = await utils.blobToDataURL(c.icon[0]);
+                            }
+                            
+                            return {
+                                name: c.name?.[0] || 'No Name',
+                                phone: c.tel?.[0] || '',
+                                email: c.email?.[0] || '',
+                                family: (c.name?.[0] || 'New').split(' ').pop() + ' Family',
+                                photoURL: photoURL, // The new base64 URL
+                                bday: c.bday?.[0] || null, // Birthday
+                                anniversary: c.anniversary?.[0] || null // Anniversary
+                            };
+                        }));
+                        
+                        modals.confirmImport(newPeople);
+
+                    } catch (err) {
+                        console.error('Error importing contacts:', err);
+                        utils.showToast('Could not get contacts.');
+                    }
+                },
+
+                copyTextToClipboard(text, btnElement) {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            utils.showToast("Copied to clipboard!");
+                            if (btnElement) {
+                                btnElement.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                                setTimeout(() => { btnElement.innerHTML = '<i class="fas fa-copy mr-1"></i> Copy'; }, 2000);
+                            }
+                        }).catch(err => this.fallbackCopyText(text, btnElement));
+                    } else {
+                        this.fallbackCopyText(text, btnElement); 
+                    }
+                },
+                fallbackCopyText(text, btnElement) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
+                    document.body.appendChild(textArea);
+                    textArea.focus(); textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                             utils.showToast("Copied to clipboard!");
+                            if (btnElement) {
+                                btnElement.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                                setTimeout(() => { btnElement.innerHTML = '<i class="fas fa-copy mr-1"></i> Copy'; }, 2000);
+                            }
+                        } else { utils.showToast("Copying failed."); }
+                    } catch (err) { utils.showToast("Copying failed."); }
+                    document.body.removeChild(textArea);
+                },
+                
+                backupData() {
+                    try {
+                        const jsonData = storageService.exportData();
+                        const blob = new Blob([jsonData], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url; a.download = 'shepherds-hand-backup.json';
+                        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        storageService.recordBackup(); 
+                        utils.showToast('Backup file downloaded!');
+                    } catch (e) { utils.showToast('Backup failed.'); }
+                },
+                
+                restoreData(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        try {
+                            const success = storageService.importData(e.target.result);
+                            if (success) {
+                                utils.showToast('Data restored successfully!');
+                                this.navigateTo('dashboard'); 
+                            } else { throw new Error('Invalid file format.'); }
+                        } catch (err) { utils.showToast('Restore failed. Invalid backup file.'); }
+                        event.target.value = null;
+                    };
+                    reader.readAsText(file);
+                },
+
+                switchPersonTab(tab) {
+                    document.querySelectorAll('.person-tab-btn').forEach(btn => {
+                        const isActive = btn.dataset.tab === tab;
+                        btn.classList.toggle('active', isActive); 
+                        btn.classList.toggle('border-sky-600', isActive); 
+                        btn.classList.toggle('text-sky-600', isActive); 
+                        btn.classList.toggle('text-slate-500', !isActive);
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(pane => 
+                        pane.classList.toggle('hidden', pane.id !== `${tab}-content`)
+                    );
+                },
+                
+                refreshCurrentView() {
+                    if (!state.dataLoaded) {
+                        ui.appLoading.classList.remove('hidden');
+                        ui.mainContent.innerHTML = ''; 
+                        return;
+                    }
+                    switch (state.currentView) {
+                        case 'dashboard': render.dashboard(); break;
+                        case 'people': render.peopleList(); break; 
+                        case 'outreach': render.outreach(); break; 
+                        case 'hospitality': render.hospitality(); break; 
+                        // UPDATED: Back to "resources"
+                        case 'resources': render.resources(); break; 
+                        case 'person-detail': 
+                            if (!state.people.find(p => p.id === state.selectedPerson?.id)) this.navigateTo('people');
+                            else render.personDetail(state.selectedPerson?.id); 
+                            break;
+                    }
+                },
+                
+                navigateTo(view, param = null) {
+                    state.currentView = view;
+                    if (param) {
+                        if (view === 'person-detail') state.selectedPerson = state.people.find(p => p.id === param);
+                    }
+                    else if (view !== 'person-detail') state.selectedPerson = null; 
+
+                    ui.navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+                    this.refreshCurrentView();
+                    ui.mainContent.scrollTop = 0;
+                }
+            };
+
+            // --- App Initialization ---
+            appController.init();
+        });
+    </script>
+</body>
 </html>

@@ -172,9 +172,9 @@
             <nav class="bg-white/80 backdrop-blur-lg shadow-[0_-2px_5px_rgba(0,0,0,0.05)] grid grid-cols-5 gap-1 p-2 z-40 border-t border-slate-200">
                 <button data-view="dashboard" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-home text-lg"></i><span class="text-xs font-medium mt-1">Home</span></button>
                 <button data-view="people" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-users text-lg"></i><span class="text-xs font-medium mt-1">People</span></button>
-                <button data-view="overdue" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-bullhorn text-lg"></i><span class="text-xs font-medium mt-1">Overdue</span></button>
+                <button data-view="tasks" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-clipboard-list text-lg"></i><span class="text-xs font-medium mt-1">Tasks</span></button>
+                <button data-view="prayer" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-hands-praying text-lg"></i><span class="text-xs font-medium mt-1">Prayer List</span></button>
                 <button data-view="hospitality" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-utensils text-lg"></i><span class="text-xs font-medium mt-1">Hospitality</span></button>
-                <button data-view="resources" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-book-open text-lg"></i><span class="text-xs font-medium mt-1">Resources</span></button>
             </nav>
         </div>
     </div>
@@ -204,7 +204,7 @@
             dataLoaded: false,
             settings: { myHousehold: null, lastBackup: null },
             peopleSubView: 'all', // 'all' or 'households'
-            overdueSubView: 'all', // 'all' or 'missed'
+            tasksSubView: 'incomplete', // 'incomplete' or 'completed'
             hospitalitySubView: 'upcoming', // 'upcoming' or 'past'
             spiritualGifts: ["Administration", "Apostleship", "Craftsmanship", "Creative Communication", "Discernment", "Encouragement", "Evangelism", "Faith", "Giving", "Healing", "Helps", "Hospitality", "Intercession", "Knowledge", "Leadership", "Mercy", "Miracles", "Prophecy", "Shepherding", "Teaching", "Wisdom"],
             churchRoles: ["Greeter", "Usher", "Small Group Leader", "Children's Ministry", "Youth Group Leader", "Worship Team (Vocal)", "Worship Team (Instrument)", "Tech Team (Sound/Slides)", "Visitation Team", "Meal Train Coordinator", "Building Maintenance", "Event Planning Committee"]
@@ -261,12 +261,16 @@
             getHouseholds() {
                 const households = {};
                 state.people.forEach(p => {
-                    if (p.family === state.settings.myHousehold) return; // Exclude my household
+                    // Note: We intentionally include 'myHousehold' here for selection lists
                     const key = p.family || p.name;
                     if (!households[key]) { households[key] = { name: key, members: [] }; }
                     households[key].members.push(p);
                 });
                 return Object.values(households).sort((a, b) => a.name.localeCompare(b.name));
+            },
+            getFilteredHouseholds() {
+                 // Excludes my household
+                return utils.getHouseholds().filter(h => h.name !== state.settings.myHousehold);
             },
             getLastContact(personId) {
                 return state.updates.filter(u => u.personId === personId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
@@ -319,7 +323,7 @@
             },
             getSundaySupperSuggestion() {
                 // Get all households, excluding my own
-                const households = utils.getHouseholds();
+                const households = utils.getFilteredHouseholds();
                 if (households.length === 0) return [];
             
                 // Find last hospitality event (hosted OR guest) for each household
@@ -328,7 +332,8 @@
                         .filter(event => {
                             const isHost = event.type === 'guest' && event.host_family === h.name;
                             const isAttendee = event.type === 'host' && (event.attendee_families || []).includes(h.name);
-                            return isHost || isAttendee;
+                            const isOtherGuest = event.type === 'guest' && (event.other_attendee_families || []).includes(h.name);
+                            return isHost || isAttendee || isOtherGuest;
                         })
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
                     
@@ -422,6 +427,9 @@
                 if (data) {
                     const parsedData = JSON.parse(data);
                     Object.assign(state, parsedData);
+                    // Ensure new state properties exist
+                    if (!state.settings) state.settings = { myHousehold: null, lastBackup: null };
+                    if (!state.prayerRequests) state.prayerRequests = [];
                 } else {
                     // First time load, seed sample data
                     this.seedSampleData();
@@ -465,9 +473,14 @@
                         const data = JSON.parse(e.target.result);
                         if (data.people && data.tasks && data.updates) {
                             localStorage.setItem('shepherdsHandPro', JSON.stringify(data));
+                            // Clear state before loading
+                            Object.keys(state).forEach(key => delete state[key]);
                             Object.assign(state, data); // Load new data into state
+                            // Ensure new properties exist
+                            if (!state.settings) state.settings = { myHousehold: null, lastBackup: null };
+                            if (!state.prayerRequests) state.prayerRequests = [];
                             state.dataLoaded = true;
-                            appController.refreshCurrentView(); // Re-render all
+                            appController.navigateTo('dashboard'); // Go to dashboard
                             utils.showToast('Data restored successfully!');
                         } else {
                             utils.showToast('Invalid backup file.');
@@ -501,7 +514,7 @@
                 ];
 
                 const hospitalityData = [
-                    { id: crypto.randomUUID(), type: "host", date: new Date(today.getTime() - 12 * 24 * 60 * 60 * 1000).toISOString(), attendee_families: ["Smith Family", "Garcia Family"], journal: "Great time together after service. The kids played well.", createdAt: new Date().toISOString() }
+                    { id: crypto.randomUUID(), type: "host", date: new Date(today.getTime() - 12 * 24 * 60 * 60 * 1000).toISOString(), attendee_families: ["Smith Family", "Garcia Family"], other_guests_text: "The Jones (visitors)", journal: "Great time together after service. The kids played well.", createdAt: new Date().toISOString() }
                 ];
                 
                 const prayerData = [
@@ -694,7 +707,7 @@
                                                 <p class="text-sm text-slate-500">${p.family || 'No household'}</p>
                                             </div>
                                         </div>
-                                        <div classf="flex items-center gap-3">
+                                        <div class="flex items-center gap-3">
                                             <span class="w-3 h-3 ${pulseClass} rounded-full mr-3" title="Contact Status"></span>
                                             <i class="fas fa-chevron-right text-slate-400"></i>
                                         </div>
@@ -706,7 +719,7 @@
                 };
 
                 const renderHouseholds = () => {
-                    const households = utils.getHouseholds();
+                    const households = utils.getFilteredHouseholds();
                     return `<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
                         <ul id="household-list-container" class="divide-y divide-slate-200">
                             ${households.length > 0 ? households.map(h => `
@@ -952,44 +965,129 @@
                     </div>
                 </div>`;
             },
-            overdueList() {
+            tasksList() {
+                if (!state.dataLoaded) return;
+                ui.appLoading.classList.add('hidden');
+                
+                const incompleteTasks = state.tasks
+                    .filter(t => !t.completed && state.people.some(p => p.id === t.personId && p.family !== state.settings.myHousehold))
+                    .sort((a,b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+                
+                const completedTasks = state.tasks
+                    .filter(t => t.completed && state.people.some(p => p.id === t.personId && p.family !== state.settings.myHousehold))
+                    .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .slice(0, 20); // Show only last 20
+
+                const renderTaskList = (tasks, isEmptyMessage) => {
+                    if (tasks.length === 0) {
+                        return `<div class="p-8 text-center text-slate-500"><p>${isEmptyMessage}</p></div>`;
+                    }
+                    return tasks.map(t => {
+                         const person = state.people.find(p => p.id === t.personId);
+                         return `<div class="bg-white p-4 rounded-xl shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <button data-task-id="${t.id}" class="toggle-task-btn h-6 w-6 flex-shrink-0 flex items-center justify-center border-2 ${t.completed ? 'border-green-500 bg-green-500' : 'border-slate-300'} rounded-full transition">
+                                        ${t.completed ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
+                                    </button>
+                                    <div>
+                                        <p class="font-medium ${t.completed ? 'text-slate-400 line-through' : 'text-slate-800'}">${t.description}</p>
+                                        <p class="text-sm text-slate-500">
+                                            ${person ? `For: ${person.name}` : ''}
+                                            <span class="mx-1">&bull;</span>
+                                            Due: ${utils.formatDate(t.dueDate)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    ${person ? `<button data-person-id="${person.id}" class="view-person-btn text-slate-400 hover:text-sky-600 w-8 h-8 flex items-center justify-center"><i class="fas fa-user"></i></button>` : ''}
+                                    <button data-task-id="${t.id}" class="delete-task-btn text-slate-400 hover:text-red-500 w-8 h-8 flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                         </div>`
+                    }).join('');
+                };
+
+                ui.mainContent.innerHTML = `<div class="animate-enter">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-slate-800">Tasks</h2>
+                        <button id="quick-add-task" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4 p-1 bg-slate-200 rounded-full">
+                        <button class="tab-btn flex-1 ${state.tasksSubView === 'incomplete' ? 'active' : ''}" data-subview="incomplete">Incomplete</button>
+                        <button class="tab-btn flex-1 ${state.tasksSubView === 'completed' ? 'active' : ''}" data-subview="completed">Completed</button>
+                    </div>
+                    <div class="space-y-3">
+                        ${state.tasksSubView === 'incomplete' ?
+                            renderTaskList(incompleteTasks, "No incomplete tasks. Good job!") :
+                            renderTaskList(completedTasks, "No tasks completed yet.")
+                        }
+                    </div>
+                </div>`;
+            },
+            prayerList() {
                  if (!state.dataLoaded) return;
                  ui.appLoading.classList.add('hidden');
                  
-                 const peopleToContact = utils.getPeopleToContact();
+                 const activeRequests = state.prayerRequests
+                    .filter(pr => pr.status === 'Active' && state.people.some(p => p.id === pr.personId && p.family !== state.settings.myHousehold))
+                    .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                
+                 const groupedRequests = activeRequests.reduce((acc, pr) => {
+                    const person = state.people.find(p => p.id === pr.personId);
+                    if (!person) return acc;
+                    
+                    if (!acc[pr.personId]) {
+                        acc[pr.personId] = {
+                            person: person,
+                            requests: []
+                        };
+                    }
+                    acc[pr.personId].requests.push(pr);
+                    return acc;
+                 }, {});
 
                  ui.mainContent.innerHTML = `<div class="animate-enter">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold text-slate-800">Overdue List</h2>
-                        <span class="font-bold text-xl text-red-500">${peopleToContact.length}</span>
+                        <h2 class="text-2xl font-bold text-slate-800">Prayer List</h2>
+                        <button id="ai-prayer-summary-btn" class="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2" ${activeRequests.length === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-magic"></i> Summary
+                        </button>
                     </div>
-                     <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                        <ul id="overdue-list-container" class="divide-y divide-slate-200">
-                            ${peopleToContact.length > 0 ? peopleToContact.map(p => {
-                                const lastContact = utils.getLastContact(p.id);
-                                const hasWhatsApp = p.phone && p.phone.length > 5;
-                                return `<li class="p-3">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center gap-4 person-item cursor-pointer" data-person-id="${p.id}">
-                                            ${utils.getAvatar(p)}
-                                            <div>
-                                                <p class="font-semibold text-slate-800">${p.name}</p>
-                                                <p class="text-sm text-slate-500">${lastContact ? `Last contact: ${utils.formatRelativeTime(lastContact.createdAt)}` : 'No contact logged'}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                             <button data-person-id="${p.id}" class="get-conversation-starters text-sky-600 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full hover:bg-sky-100" title="Get AI Conversation Starters">
-                                                <i class="fas fa-comment-dots"></i>
+
+                    <div id="prayer-summary-output" class="hidden mb-4 p-4 bg-white rounded-2xl shadow-sm">
+                        <div id="prayer-summary-loading" class="text-center text-slate-500"><i class="fas fa-spinner animate-spin"></i> Loading summary...</div>
+                        <div id="prayer-summary-content" class="text-sm text-slate-700 whitespace-pre-wrap"></div>
+                        <div id="prayer-summary-error" class="text-sm text-red-500"></div>
+                    </div>
+                     
+                     <div class="space-y-4">
+                        ${activeRequests.length > 0 ? Object.values(groupedRequests).map(group => `
+                            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                                <div class="p-4 flex items-center gap-3 border-b border-slate-100 person-item cursor-pointer" data-person-id="${group.person.id}">
+                                    ${utils.getAvatar(group.person, 'avatar-sm')}
+                                    <p class="font-semibold text-slate-800">${group.person.name}</p>
+                                </div>
+                                <div class="space-y-3 p-4">
+                                    ${group.requests.map(pr => `
+                                        <div class="flex items-start justify-between">
+                                            <p class="text-slate-700 flex-1 mr-4 whitespace-pre-wrap">${pr.request}</p>
+                                            <button data-pr-id="${pr.id}" class="toggle-prayer-status-btn flex-shrink-0 font-semibold text-xs py-1 px-3 rounded-full bg-amber-100 text-amber-700" title="Mark as Answered">
+                                                Active
                                             </button>
-                                            ${hasWhatsApp ? `<a href="https://wa.me/${utils.formatPhoneNumberForWhatsApp(p.phone)}" target="_blank" class="bg-green-100 text-green-700 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="fab fa-whatsapp text-xl"></i></a>` : ''}
-                                            <button data-person-id="${p.id}" class="log-contact-btn bg-sky-100 text-sky-700 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="fas fa-edit"></i></button>
                                         </div>
-                                    </div>
-                                    <div id="convo-starter-${p.id}" class="hidden mt-3 p-3 bg-sky-50 rounded-lg text-sm text-sky-800"></div>
-                                </li>`
-                            }).join('') : `<li class="p-8 text-center text-slate-500"><i class="fas fa-check-circle text-4xl text-green-500 mb-3"></i><p>Everyone is up to date!</p></li>`}
-                        </ul>
-                    </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('') : `
+                            <div class="bg-white rounded-2xl shadow-sm p-8 text-center text-slate-500">
+                                <i class="fas fa-check-circle text-4xl text-green-500 mb-3"></i>
+                                <p>No active prayer requests.</p>
+                            </div>
+                        `}
+                     </div>
                  </div>`;
             },
             hospitality() {
@@ -1008,6 +1106,7 @@
                     const title = h.type === 'host' ? (h.attendee_families || []).join(', ') : `Guests at ${h.host_family}`;
                     const icon = h.type === 'host' ? 'fa-house-user' : 'fa-handshake';
                     const iconBg = h.type === 'host' ? 'bg-sky-100 text-sky-700' : 'bg-purple-100 text-purple-700';
+                    const otherGuests = h.other_guests_text || '';
 
                     return `<div class="bg-white p-4 rounded-xl shadow-sm">
                         <div class="flex items-start justify-between">
@@ -1016,6 +1115,7 @@
                                 <div>
                                     <p class="font-semibold text-slate-800">${title || '(No attendees)'}</p>
                                     <p class="text-sm text-slate-500">${utils.formatDate(h.date, {weekday: 'long'})}</p>
+                                    ${otherGuests ? `<p class="text-xs text-slate-500 mt-1">Also with: ${otherGuests}</p>` : ''}
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -1025,7 +1125,7 @@
                         </div>
                         ${!h.journal ? `
                             <div class="text-right mt-3 pt-3 border-t border-slate-100">
-                                <button data-event-id="${h.id}" class="log-hospitality-journal-btn bg-amber-100 text-amber-700 font-semibold py-1.5 px-3 rounded-lg text-sm">Log Journal</pre>
+                                <button data-event-id="${h.id}" class="log-hospitality-journal-btn bg-amber-100 text-amber-700 font-semibold py-1.5 px-3 rounded-lg text-sm">Log Journal</button>
                             </div>
                         ` : `
                             <p class="text-sm text-slate-600 mt-3 pt-3 border-t border-slate-100 whitespace-pre-wrap">${h.journal}</p>
@@ -1051,34 +1151,6 @@
                         }
                     </div>
                 </div>`;
-            },
-            resources() {
-                 if (!state.dataLoaded) return;
-                 ui.appLoading.classList.add('hidden');
-                 ui.mainContent.innerHTML = `<div class="animate-enter">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold text-slate-800">Resources</h2>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="text-xl font-bold mb-4">Sermon Illustration Creator</h3>
-                        <p class="text-slate-500 mb-2">Hello pastor. As your 'Sermon Illustration Creator', I'm here to find riveting, effective, and powerful illustrations for your message.</p>
-                        <p class="text-slate-500 mb-4">What is your sermon point?</p>
-                        
-                        <div class="flex gap-2">
-                            <input type="text" id="sermon-topic-input" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="e.g., The Perseverance of the Saints">
-                            <button id="get-illustration-btn" class="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg"><i class="fas fa-arrow-right"></i></button>
-                        </div>
-
-                        <div id="illustration-output" class="mt-6 space-y-4">
-                            <div id="illustration-loading" class="text-center text-slate-500 hidden">
-                                <i class="fas fa-spinner animate-spin text-2xl"></i>
-                                <p class="mt-2">Generating illustrations...</p>
-                            </div>
-                            <div id="illustration-error" class="text-center text-red-500 hidden"></div>
-                            <div id="illustration-content"></div>
-                        </div>
-                    </div>
-                 </div>`;
             },
             settings() {
                 const households = [{name: "None", members:[]}].concat(utils.getHouseholds());
@@ -1167,105 +1239,43 @@
                     spinner.classList.add('hidden');
                 }
             },
-            async getSermonIllustration(topic) {
-                const loadingEl = document.getElementById('illustration-loading');
-                const errorEl = document.getElementById('illustration-error');
-                const contentEl = document.getElementById('illustration-content');
+            async getPrayerSummary() {
+                const loadingEl = document.getElementById('prayer-summary-loading');
+                const errorEl = document.getElementById('prayer-summary-error');
+                const contentEl = document.getElementById('prayer-summary-content');
+                const outputEl = document.getElementById('prayer-summary-output');
 
+                outputEl.classList.remove('hidden');
                 loadingEl.classList.remove('hidden');
                 errorEl.classList.add('hidden');
                 contentEl.innerHTML = '';
 
-                const systemPrompt = `
-You are an expert 'Sermon Illustration Creator' for a conservative, Bible-believing Evangelical Christian pastor (who respects MacArthur, Piper, Washer).
-Your task is to provide a detailed and robust response for a single sermon point.
-Your response MUST be structured in JSON format. Do not write any text outside the main JSON object.
+                const activeRequests = state.prayerRequests
+                    .filter(pr => pr.status === 'Active')
+                    .map(pr => {
+                        const person = state.people.find(p => p.id === pr.personId);
+                        return `- ${person ? person.name : 'Someone'}: ${pr.request}`;
+                    });
+                
+                if (activeRequests.length === 0) {
+                     loadingEl.classList.add('hidden');
+                     contentEl.innerHTML = 'No active requests to summarize.';
+                     return;
+                }
 
-The JSON object must have three top-level keys: "illustrations", "statistics", and "powerQuotes", "parallelScriptures".
-
-1.  **"illustrations"**: An array of 5 objects. Each object must have "type" (string) and "text" (string). The 5 types MUST be:
-    - "Historically Accurate"
-    - "Humorous & Historically Accurate"
-    - "Old Testament Story"
-    - "Modern Story"
-    - "Bonus/Wildcard (Science, Nature, or Literature)"
-    For each, include a (Source: ...) at the end of the text.
-
-2.  **"statistics"**: An array of 1 object. The object must have "statistic" (string) and "source" (string).
-
-3.  **"powerQuotes"**: An array of 5 objects. Each object must have "quote" (string) and "author" (string).
-
-4.  **"parallelScriptures"**: An array of 3 objects. Each object must have "reference" (string) and "text" (string). All scripture MUST be from the King James Version (KJV).
-
-Do not use markdown or tables. Only output the raw JSON object.
-`;
-                const userPrompt = `Sermon Point: ${topic}`;
+                const systemPrompt = "You are a pastoral assistant. A pastor will provide a list of prayer requests. Summarize them into key categories (e.g., Health, Family, Spiritual, Financial) to help him in his prayer time. Be concise, respectful, and organized.";
+                const userPrompt = `Here are the active prayer requests from my congregation. Please summarize them for me:\n\n${activeRequests.join('\n')}`;
 
                 try {
-                    const rawResult = await utils.callGeminiApi(systemPrompt, userPrompt);
-                    
-                    // Clean the result to ensure it's valid JSON
-                    const jsonString = rawResult.trim().replace(/^```json\s*/, '').replace(/```$/, '');
-                    const result = JSON.parse(jsonString);
-
-                    let html = '';
-
-                    // Illustrations
-                    if (result.illustrations && result.illustrations.length > 0) {
-                        html += '<h4 class="text-lg font-semibold mb-2">Illustrations</h4>';
-                        result.illustrations.forEach(item => {
-                            html += `<div class="gemini-output-card">
-                                <button class="copy-btn" data-text="${encodeURIComponent(item.text)}"><i class="fas fa-copy"></i></button>
-                                <strong class="text-sky-700">${item.type}</strong>
-                                <p class="mt-2 text-sm">${item.text.replace(/\n/g, '<br>')}</p>
-                            </div>`;
-                        });
-                    }
-
-                    // Supporting Material
-                    html += '<h4 class="text-lg font-semibold mt-6 mb-2">Supporting Material</h4>';
-                    
-                    // Statistics
-                    if (result.statistics && result.statistics.length > 0) {
-                        const item = result.statistics[0];
-                        const text = `${item.statistic} (Source: ${item.source})`;
-                        html += `<div class="gemini-output-card">
-                            <button class="copy-btn" data-text="${encodeURIComponent(text)}"><i class="fas fa-copy"></i></button>
-                            <strong class="text-sky-700">Statistic</strong>
-                            <p class="mt-2 text-sm">${text}</p>
-                        </div>`;
-                    }
-
-                    // Power Quotes
-                    if (result.powerQuotes && result.powerQuotes.length > 0) {
-                        const allQuotes = result.powerQuotes.map(item => `"${item.quote}" — ${item.author}`).join('\n\n');
-                        html += `<div class="gemini-output-card">
-                            <button class="copy-btn" data-text="${encodeURIComponent(allQuotes)}"><i class="fas fa-copy"></i></button>
-                            <strong class="text-sky-700">Power Quotes</strong>
-                            <div class="mt-2 text-sm">${allQuotes.replace(/\n/g, '<br>')}</div>
-                        </div>`;
-                    }
-
-                    // Parallel Scriptures
-                    if (result.parallelScriptures && result.parallelScriptures.length > 0) {
-                        const allScriptures = result.parallelScriptures.map(item => `${item.reference} (KJV):\n"${item.text}"`).join('\n\n');
-                        html += `<div class="gemini-output-card">
-                            <button class="copy-btn" data-text="${encodeURIComponent(allScriptures)}"><i class="fas fa-copy"></i></button>
-                            <strong class="text-sky-700">Parallel Scriptures (KJV)</strong>
-                            <div class="mt-2 text-sm">${allScriptures.replace(/\n/g, '<br>')}</div>
-                        </div>`;
-                    }
-
-                    contentEl.innerHTML = html;
-
+                    const result = await utils.callGeminiApi(systemPrompt, userPrompt);
+                    contentEl.innerHTML = result;
                 } catch (error) {
-                    console.error("Sermon Illustration Error:", error);
-                    errorEl.textContent = `Error generating response. ${error.message}. Please try again.`;
+                    errorEl.textContent = `Error generating summary: ${error.message}`;
                     errorEl.classList.remove('hidden');
                 } finally {
                     loadingEl.classList.add('hidden');
                 }
-            }
+            },
         };
 
         // --- MODALS (Content Generators) ---
@@ -1382,7 +1392,6 @@ Do not use markdown or tables. Only output the raw JSON object.
                                 <button type="button" id="ai-task-breakdown-btn" class="bg-sky-100 text-sky-700 font-semibold px-3 rounded-lg" title="AI Task Breakdown">✨</button>
                                 <button type="button" id="ai-task-spinner" class="bg-sky-100 text-sky-700 font-semibold px-3 rounded-lg hidden" disabled><i class="fas fa-spinner animate-spin"></i></button>
                             </div>
-                            <textarea id="task-description-breakdown" rows="5" class="w-full px-3 py-2 border border-slate-300 rounded-lg mt-2 hidden" placeholder="Checklist..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-600 mb-1">Due Date</label>
@@ -1412,7 +1421,7 @@ Do not use markdown or tables. Only output the raw JSON object.
             },
             addEditHospitalityEvent(event = null, prefilledFamilies = []) {
                 const isEditing = !!event; 
-                const households = utils.getHouseholds(); 
+                const households = utils.getFilteredHouseholds(); // Excludes my household
                 const date = event ? new Date(event.date) : new Date(); 
                 const dateString = date.toISOString().split('T')[0];
                 const type = event ? event.type : 'host';
@@ -1432,21 +1441,39 @@ Do not use markdown or tables. Only output the raw JSON object.
                             </select>
                         </div>
                         
-                        <div id="host-fields" class="${type === 'host' ? '' : 'hidden'}">
-                            <label class="block text-sm font-medium text-slate-600 mb-1">Attendees (Households)</label>
-                            <div class="max-h-48 overflow-y-auto space-y-2 p-3 border rounded-lg">
-                                ${households.map(h => `<label class="flex items-center gap-3 p-1 rounded-md hover:bg-slate-100">
-                                    <input type="checkbox" name="attendees" value="${h.name}" class="h-4 w-4 rounded" ${ (isEditing && (event.attendee_families || []).includes(h.name)) || (!isEditing && prefilledFamilies.includes(h.name)) ? 'checked' : ''}>
-                                    <span>${h.name}</span>
-                                </label>`).join('')}
+                        <div id="host-fields" class="${type === 'host' ? '' : 'hidden'} space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Attendees (Households)</label>
+                                <div class="max-h-32 overflow-y-auto space-y-2 p-3 border rounded-lg">
+                                    ${households.map(h => `<label class="flex items-center gap-3 p-1 rounded-md hover:bg-slate-100">
+                                        <input type="checkbox" name="attendees" value="${h.name}" class="h-4 w-4 rounded" ${ (isEditing && (event.attendee_families || []).includes(h.name)) || (!isEditing && prefilledFamilies.includes(h.name)) ? 'checked' : ''}>
+                                        <span>${h.name}</span>
+                                    </label>`).join('')}
+                                </div>
                             </div>
                         </div>
 
-                        <div id="guest-fields" class="${type === 'guest' ? '' : 'hidden'}">
-                            <label for="hospitality-host" class="block text-sm font-medium text-slate-600 mb-1">Host Family</label>
-                            <select id="hospitality-host" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                                ${households.map(h => `<option value="${h.name}" ${event?.host_family === h.name ? 'selected' : ''}>${h.name}</option>`).join('')}
-                            </select>
+                        <div id="guest-fields" class="${type === 'guest' ? '' : 'hidden'} space-y-4">
+                            <div>
+                                <label for="hospitality-host" class="block text-sm font-medium text-slate-600 mb-1">Host Family</label>
+                                <select id="hospitality-host" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    ${households.map(h => `<option value="${h.name}" ${event?.host_family === h.name ? 'selected' : ''}>${h.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Other Church Families Present</label>
+                                <div class="max-h-32 overflow-y-auto space-y-2 p-3 border rounded-lg">
+                                    ${households.map(h => `<label class="flex items-center gap-3 p-1 rounded-md hover:bg-slate-100">
+                                        <input type="checkbox" name="other_attendees" value="${h.name}" class="h-4 w-4 rounded" ${ (isEditing && (event.other_attendee_families || []).includes(h.name)) ? 'checked' : ''}>
+                                        <span>${h.name}</span>
+                                    </label>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="hospitality-other-guests" class="block text-sm font-medium text-slate-600 mb-1">Other Guests (Visitors, etc.)</label>
+                            <input type="text" id="hospitality-other-guests" class="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="e.g., The Jones, Br. Tim" value="${event?.other_guests_text || ''}">
                         </div>
 
                     </div>
@@ -1549,7 +1576,7 @@ Do not use markdown or tables. Only output the raw JSON object.
                          '.tab-btn': el => {
                             const subview = el.dataset.subview;
                             if (state.currentView === 'people') state.peopleSubView = subview;
-                            if (state.currentView === 'overdue') state.overdueSubView = subview;
+                            if (state.currentView === 'tasks') state.tasksSubView = subview;
                             if (state.currentView === 'hospitality') state.hospitalitySubView = subview;
                             this.refreshCurrentView();
                          },
@@ -1563,8 +1590,8 @@ Do not use markdown or tables. Only output the raw JSON object.
                          '#get-conversation-starters': el => geminiService.getConversationStarters(el.dataset.personId),
                          '.log-hospitality-btn': el => modals.addEditHospitalityEvent(null, [el.dataset.families]),
 
-                         // --- Overdue List ---
-                         '.get-conversation-starters': el => geminiService.getConversationStarters(el.dataset.personId),
+                         // --- Prayer List ---
+                         '#ai-prayer-summary-btn': () => geminiService.getPrayerSummary(),
 
                          // --- Person Detail ---
                          '#back-to-people': () => this.navigateTo('people'),
@@ -1600,24 +1627,6 @@ Do not use markdown or tables. Only output the raw JSON object.
                          '.edit-hospitality-btn': el => modals.addEditHospitalityEvent(state.hospitality.find(h => h.id === el.dataset.eventId)),
                          '.delete-hospitality-btn': el => modals.confirm('Delete Event?', 'This will be removed.', () => this.deleteHospitalityEvent(el.dataset.eventId)),
                          '.log-hospitality-journal-btn': el => modals.logHospitalityJournal(el.dataset.eventId),
-
-                         // --- Resources ---
-                         '#get-illustration-btn': () => {
-                            const topic = document.getElementById('sermon-topic-input').value;
-                            if (topic) geminiService.getSermonIllustration(topic);
-                         },
-                         '.copy-btn': el => {
-                            const text = decodeURIComponent(el.dataset.text);
-                            if (navigator.clipboard) {
-                                navigator.clipboard.writeText(text).then(() => {
-                                    utils.showToast('Copied to clipboard!');
-                                }).catch(err => {
-                                    utils.fallbackCopyText(text);
-                                });
-                            } else {
-                                utils.fallbackCopyText(text);
-                            }
-                         }
                     };
 
                     for (const selector in eventMap) {
@@ -1763,12 +1772,18 @@ Do not use markdown or tables. Only output the raw JSON object.
                     if (form.id === 'hospitality-form') {
                         const eventId = form.dataset.eventId || crypto.randomUUID();
                         const type = form.querySelector('#hospitality-type').value;
-                        let data = { id: eventId, type, date: new Date(form.querySelector('#hospitality-date').value + 'T00:00:00').toISOString() };
+                        let data = { 
+                            id: eventId, 
+                            type, 
+                            date: new Date(form.querySelector('#hospitality-date').value + 'T00:00:00').toISOString(),
+                            other_guests_text: form.querySelector('#hospitality-other-guests').value
+                        };
 
                         if (type === 'host') {
                             data.attendee_families = Array.from(form.querySelectorAll('input[name="attendees"]:checked')).map(el => el.value);
                         } else {
                             data.host_family = form.querySelector('#hospitality-host').value;
+                            data.other_attendee_families = Array.from(form.querySelectorAll('input[name="other_attendees"]:checked')).map(el => el.value);
                         }
 
                         const existing = state.hospitality.find(e => e.id === eventId);
@@ -1795,15 +1810,16 @@ Do not use markdown or tables. Only output the raw JSON object.
                         if (event) {
                             event.journal = journal;
                             utils.showToast('Journal saved!');
-                            // --- THIS IS THE KEY INTEGRATION ---
-                            // Auto-log an "Update" for all involved families
                             
+                            // --- THIS IS THE KEY INTEGRATION (UPDATED) ---
                             let familiesToUpdate = [];
                             if (event.type === 'host') {
                                 familiesToUpdate = event.attendee_families || [];
                             } else if (event.type === 'guest') {
-                                familiesToUpdate = [event.host_family];
+                                familiesToUpdate = [event.host_family, ...(event.other_attendee_families || [])];
                             }
+                            
+                            // Note: We don't log an update for text-based "other guests" as they aren't 'People' in the app
 
                             familiesToUpdate.forEach(family => {
                                 const members = state.people.filter(p => p.family === family);
@@ -1896,7 +1912,8 @@ Do not use markdown or tables. Only output the raw JSON object.
                         ...contact,
                         pulse: DEFAULT_PULSE,
                         keyInfo: "Imported from device contacts.",
-                        createdAt: new Date().toISOString()
+                        createdAt: new Date().toISOString(),
+                        photoURL: contact.photoURL || null // Ensure photoURL is saved
                     });
                 });
                 db.save();
@@ -1960,9 +1977,9 @@ Do not use markdown or tables. Only output the raw JSON object.
                 switch (state.currentView) {
                     case 'dashboard': render.dashboard(); break;
                     case 'people': render.peopleList(); break;
-                    case 'overdue': render.overdueList(); break;
+                    case 'tasks': render.tasksList(); break;
+                    case 'prayer': render.prayerList(); break;
                     case 'hospitality': render.hospitality(); break;
-                    case 'resources': render.resources(); break;
                 }
             },
             navigateTo(view, param = null) {

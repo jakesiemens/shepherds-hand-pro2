@@ -134,128 +134,6 @@
         .copy-btn:active {
             background-color: #e2e8f0;
         }
-        /* Settings Textarea */
-        .settings-textarea {
-            width: 100%;
-            height: 120px;
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.875rem;
-        }
-        
-        /* --- NEW: FAB --- */
-        .fab-container {
-            position: fixed;
-            bottom: 80px; /* Above nav bar */
-            right: 24px;
-            z-index: 45;
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-        }
-        .fab-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 9999px;
-            background-color: #0284c7;
-            color: white;
-            border: none;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s ease-out, background-color 0.2s;
-        }
-        .fab-btn.open {
-            transform: rotate(45deg);
-            background-color: #0369a1;
-        }
-        .fab-menu {
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            margin-bottom: 16px;
-            list-style: none;
-            padding: 0;
-            transition: all 0.3s ease-out;
-            transform: scale(0.9) translateY(10px);
-            opacity: 0;
-            visibility: hidden;
-        }
-        .fab-menu.open {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-            visibility: visible;
-        }
-        .fab-menu-item {
-            display: flex;
-            align-items: center;
-            margin-top: 12px;
-            cursor: pointer;
-        }
-        .fab-menu-label {
-            background-color: white;
-            color: #1e293b;
-            padding: 6px 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-right: 12px;
-            white-space: nowrap;
-        }
-        .fab-menu-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 9999px;
-            background-color: #38bdf8;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .fab-menu-icon.green { background-color: #22c55e; }
-        .fab-menu-icon.purple { background-color: #a855f7; }
-        .fab-menu-icon.amber { background-color: #f59e0b; }
-        
-        /* --- NEW: Timeline --- */
-        .timeline {
-            position: relative;
-            padding-left: 30px; /* Space for icons and line */
-            border-left: 3px solid #e2e8f0;
-            margin-left: 20px;
-        }
-        .timeline-item {
-            position: relative;
-            padding-bottom: 24px;
-        }
-        .timeline-item:last-child {
-            padding-bottom: 4px;
-        }
-        .timeline-icon {
-            position: absolute;
-            left: -46px; /* (Icon width / 2) + padding + (line width / 2) */
-            top: 0;
-            width: 40px;
-            height: 40px;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.875rem;
-        }
-        .timeline-content {
-            background-color: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased">
@@ -265,18 +143,11 @@
         <!-- Main App Screen -->
         <div id="main-app" class="h-full w-full flex flex-col">
             <header class="bg-white/80 backdrop-blur-lg shadow-sm p-4 flex justify-between items-center z-20 border-b border-slate-200">
-                <div id="header-title" class="flex items-center gap-3">
+                <div class="flex items-center gap-3">
                     <i class="fas fa-praying-hands text-2xl text-sky-600"></i>
                     <h1 class="text-xl font-bold text-slate-800">Shepherd's Hand</h1>
                 </div>
-                <!-- NEW: Header for Settings Page -->
-                <div id="settings-header" class="hidden w-full">
-                    <button id="back-to-dashboard-btn" class="flex items-center gap-2 font-semibold text-sky-600">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Dashboard
-                    </button>
-                </div>
-                <div id="header-buttons" class="flex items-center gap-2">
+                <div class="flex items-center gap-2">
                     <button id="backup-btn" class="text-slate-500 hover:text-sky-600 font-medium text-sm flex items-center gap-2 py-2 px-3 bg-slate-100 rounded-lg" title="Backup Data">
                         <i class="fas fa-download"></i> <span class="hidden sm:inline">Backup</span>
                     </button>
@@ -298,7 +169,7 @@
                 </div>
             </main>
 
-            <nav id="main-nav" class="bg-white/80 backdrop-blur-lg shadow-[0_-2px_5px_rgba(0,0,0,0.05)] grid grid-cols-5 gap-1 p-2 z-40 border-t border-slate-200">
+            <nav class="bg-white/80 backdrop-blur-lg shadow-[0_-2px_5px_rgba(0,0,0,0.05)] grid grid-cols-5 gap-1 p-2 z-40 border-t border-slate-200">
                 <button data-view="dashboard" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-home text-lg"></i><span class="text-xs font-medium mt-1">Home</span></button>
                 <button data-view="people" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-users text-lg"></i><span class="text-xs font-medium mt-1">People</span></button>
                 <button data-view="tasks" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-clipboard-list text-lg"></i><span class="text-xs font-medium mt-1">Tasks</span></button>
@@ -306,31 +177,6 @@
                 <button data-view="hospitality" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg"><i class="fas fa-utensils text-lg"></i><span class="text-xs font-medium mt-1">Hospitality</span></button>
             </nav>
         </div>
-    </div>
-    
-    <!-- --- NEW: FAB --- -->
-    <div id="fab-container" class="fab-container">
-        <ul id="fab-menu" class="fab-menu">
-            <li class="fab-menu-item" id="fab-add-task">
-                <span class="fab-menu-label">Create Task</span>
-                <div class="fab-menu-icon green"><i class="fas fa-check"></i></div>
-            </li>
-            <li class="fab-menu-item" id="fab-add-prayer">
-                <span class="fab-menu-label">Add Prayer Request</span>
-                <div class="fab-menu-icon purple"><i class="fas fa-hands-praying"></i></div>
-            </li>
-             <li class="fab-menu-item" id="fab-add-hospitality">
-                <span class="fab-menu-label">Schedule Visit</span>
-                <div class="fab-menu-icon amber"><i class="fas fa-utensils"></i></div>
-            </li>
-            <li class="fab-menu-item" id="fab-log-update">
-                <span class="fab-menu-label">Log Update</span>
-                <div class="fab-menu-icon"><i class="fas fa-plus-circle"></i></div>
-            </li>
-        </ul>
-        <button id="fab-btn" class="fab-btn">
-            <i class="fas fa-plus"></i>
-        </button>
     </div>
 
     <!-- Modal Shell -->
@@ -348,17 +194,7 @@
         // --- CONSTANTS & CONFIG ---
         const API_KEY = ""; // Leave blank
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
-        
-        // --- DEFAULTS (for settings) ---
-        const DEFAULT_SETTINGS = {
-            myHousehold: null,
-            lastBackup: null,
-            defaultPulse: 30,
-            spiritualGifts: ["Administration", "Apostleship", "Craftsmanship", "Creative Communication", "Discernment", "Encouragement", "Evangelism", "Faith", "Giving", "Healing", "Helps", "Hospitality", "Intercession", "Knowledge", "Leadership", "Mercy", "Miracles", "Prophecy", "Shepherding", "Teaching", "Wisdom"],
-            churchRoles: ["Greeter", "Usher", "Small Group Leader", "Children's Ministry", "Youth Group Leader", "Worship Team (Vocal)", "Worship Team (Instrument)", "Tech Team (Sound/Slides)", "Visitation Team", "Meal Train Coordinator", "Building Maintenance", "Event Planning Committee"],
-            updateTypes: ['Meeting', 'Phone Call', 'WhatsApp Chat', 'Hospital Visit', 'Home Visit', 'Prayer', 'Counseling', 'General Note', 'Loss of Loved One'],
-            followUpTriggers: ['Hospital Visit', 'Home Visit', 'Counseling', 'Loss of Loved One', 'Prayer'] // NEW: Types that trigger follow-up
-        };
+        const DEFAULT_PULSE = 30;
 
         // --- STATE ---
         const state = { 
@@ -366,18 +202,18 @@
             currentView: 'dashboard',
             selectedPerson: null,
             dataLoaded: false,
-            settings: { ...DEFAULT_SETTINGS }, // Start with defaults
+            settings: { myHousehold: null, lastBackup: null },
             peopleSubView: 'all', // 'all' or 'households'
             tasksSubView: 'incomplete', // 'incomplete' or 'completed'
             hospitalitySubView: 'upcoming', // 'upcoming' or 'past'
-            isFabMenuOpen: false, // NEW
+            spiritualGifts: ["Administration", "Apostleship", "Craftsmanship", "Creative Communication", "Discernment", "Encouragement", "Evangelism", "Faith", "Giving", "Healing", "Helps", "Hospitality", "Intercession", "Knowledge", "Leadership", "Mercy", "Miracles", "Prophecy", "Shepherding", "Teaching", "Wisdom"],
+            churchRoles: ["Greeter", "Usher", "Small Group Leader", "Children's Ministry", "Youth Group Leader", "Worship Team (Vocal)", "Worship Team (Instrument)", "Tech Team (Sound/Slides)", "Visitation Team", "Meal Train Coordinator", "Building Maintenance", "Event Planning Committee"]
         };
 
         // --- UI ELEMENTS ---
         const ui = {
             mainApp: document.getElementById('main-app'),
             mainContent: document.getElementById('main-content'),
-            mainNav: document.getElementById('main-nav'),
             navButtons: document.querySelectorAll('.nav-btn'),
             modalContainer: document.getElementById('modal-container'),
             modalContent: document.getElementById('modal-content'),
@@ -388,13 +224,6 @@
             restoreBtn: document.getElementById('restore-btn'),
             restoreInput: document.getElementById('restore-input'),
             settingsBtn: document.getElementById('settings-btn'),
-            headerTitle: document.getElementById('header-title'),
-            headerButtons: document.getElementById('header-buttons'),
-            settingsHeader: document.getElementById('settings-header'),
-            backToDashboardBtn: document.getElementById('back-to-dashboard-btn'),
-            fabContainer: document.getElementById('fab-container'), // NEW
-            fabBtn: document.getElementById('fab-btn'), // NEW
-            fabMenu: document.getElementById('fab-menu'), // NEW
         };
 
         // --- UTILS ---
@@ -424,10 +253,7 @@
                     setTimeout(() => ui.toast.classList.add('hidden'), 300);
                 }, 3000);
             },
-            getIconForUpdateType(type) { 
-                const icons = { 'Meeting': 'fa-solid fa-coffee', 'Phone Call': 'fa-solid fa-phone', 'Hospital Visit': 'fa-solid fa-hospital', 'Home Visit': 'fa-solid fa-house-user', 'Prayer': 'fa-solid fa-person-praying', 'Counseling': 'fa-solid fa-hand-holding-heart', 'General Note': 'fa-solid fa-note-sticky', 'WhatsApp Chat': 'fab fa-whatsapp', 'Hospitality': 'fa-solid fa-utensils', 'Loss of Loved One': 'fa-solid fa-cross' }; 
-                return icons[type] || 'fa-solid fa-circle-info'; 
-            },
+            getIconForUpdateType(type) { const icons = { 'Meeting': 'fa-solid fa-coffee', 'Phone Call': 'fa-solid fa-phone', 'Hospital Visit': 'fa-solid fa-hospital', 'Home Visit': 'fa-solid fa-house-user', 'Prayer': 'fa-solid fa-person-praying', 'Counseling': 'fa-solid fa-hand-holding-heart', 'General Note': 'fa-solid fa-note-sticky', 'WhatsApp Chat': 'fab fa-whatsapp', 'Hospitality': 'fa-solid fa-utensils' }; return icons[type] || 'fa-solid fa-circle-info'; },
             getIconForMilestoneType(type) { const icons = { 'Birthday': 'fa-solid fa-birthday-cake', 'Anniversary': 'fa-solid fa-heart', 'Baptism': 'fa-solid fa-water', 'Joined Church': 'fa-solid fa-church', 'Loss of Loved One': 'fa-solid fa-cross', }; return icons[type] || 'fa-solid fa-star'; },
             formatPhoneNumberForWhatsApp(phone) { if (!phone) return ''; return phone.replace(/\D/g, ''); },
             generateInitials(name) { if (!name) return '?'; const names = name.split(' '); const initials = names.map(n => n[0]).join(''); return initials.slice(0, 2).toUpperCase(); },
@@ -456,7 +282,7 @@
             },
             getPersonPulseStatus(person) {
                 const days = utils.getDaysSinceLastContact(person.id);
-                const pulse = person.pulse || state.settings.defaultPulse;
+                const pulse = person.pulse || DEFAULT_PULSE;
                 if (days > pulse) return 'overdue'; // red
                 if (days <= pulse) return 'recent'; // green
                 return 'unknown';
@@ -465,7 +291,7 @@
                 return state.people
                     .filter(p => p.family !== state.settings.myHousehold)
                     .map(p => ({ ...p, daysSinceContact: utils.getDaysSinceLastContact(p.id) }))
-                    .filter(p => p.daysSinceContact > (p.pulse || state.settings.defaultPulse))
+                    .filter(p => p.daysSinceContact > (p.pulse || DEFAULT_PULSE))
                     .sort((a, b) => b.daysSinceContact - a.daysSinceContact);
             },
             getSuggestedContact() {
@@ -479,7 +305,7 @@
                 const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
                 return state.milestones
-                    .filter(m => (m.type === 'Birthday' || m.type === 'Anniversary') && state.people.some(p => p.id === m.personId && p.family !== state.settings.myHousehold))
+                    .filter(m => (m.type === 'Birthday' || m.type === 'Anniversary') && m.family !== state.settings.myHousehold)
                     .map(m => ({ ...m, date: new Date(m.date) }))
                     .map(m => {
                         const mDate = m.date.getDate();
@@ -524,23 +350,6 @@
 
                 // Return the two households we've seen least recently
                 return householdsWithLastEvent.slice(0, 2);
-            },
-            // --- NEW: Recent Activity ---
-            getRecentActivity() {
-                const activities = [];
-                // Get all updates
-                state.updates.forEach(u => activities.push({ type: 'update', data: u, date: new Date(u.createdAt) }));
-                // Get completed tasks
-                state.tasks.filter(t => t.completed && t.completedAt).forEach(t => activities.push({ type: 'task', data: t, date: new Date(t.completedAt) }));
-                // Get hospitality events
-                state.hospitality.forEach(h => activities.push({ type: 'hospitality', data: h, date: new Date(h.date) }));
-                // Get new people
-                state.people.forEach(p => activities.push({ type: 'person', data: p, date: new Date(p.createdAt) }));
-
-                return activities
-                    .filter(a => a.date <= new Date()) // No future items
-                    .sort((a, b) => b.date.getTime() - a.date.getTime())
-                    .slice(0, 5); // Get top 5 most recent
             },
             blobToDataURL(blob) {
                 return new Promise((resolve, reject) => {
@@ -618,17 +427,12 @@
                 if (data) {
                     const parsedData = JSON.parse(data);
                     Object.assign(state, parsedData);
-                    
-                    // --- NEW: Settings Migration ---
-                    // Merge saved settings with defaults to ensure new settings are added
-                    const savedSettings = parsedData.settings || {};
-                    state.settings = { ...DEFAULT_SETTINGS, ...savedSettings };
-                    // --- End Settings Migration ---
-
+                    // Ensure new state properties exist
+                    if (!state.settings) state.settings = { myHousehold: null, lastBackup: null };
+                    if (!state.prayerRequests) state.prayerRequests = [];
                 } else {
                     // First time load, seed sample data
                     this.seedSampleData();
-                    state.settings = { ...DEFAULT_SETTINGS }; // Ensure settings are initialized
                 }
                 state.dataLoaded = true;
                 appController.refreshCurrentView();
@@ -672,12 +476,9 @@
                             // Clear state before loading
                             Object.keys(state).forEach(key => delete state[key]);
                             Object.assign(state, data); // Load new data into state
-                            
-                            // --- NEW: Settings Migration on Restore ---
-                            const savedSettings = data.settings || {};
-                            state.settings = { ...DEFAULT_SETTINGS, ...savedSettings };
-                            // --- End Settings Migration ---
-
+                            // Ensure new properties exist
+                            if (!state.settings) state.settings = { myHousehold: null, lastBackup: null };
+                            if (!state.prayerRequests) state.prayerRequests = [];
                             state.dataLoaded = true;
                             appController.navigateTo('dashboard'); // Go to dashboard
                             utils.showToast('Data restored successfully!');
@@ -726,7 +527,7 @@
                 state.milestones = milestonesData;
                 state.hospitality = hospitalityData;
                 state.prayerRequests = prayerData;
-                state.settings = { ...DEFAULT_SETTINGS }; // Use default settings
+                state.settings = { myHousehold: null, lastBackup: null };
 
                 this.save();
                 utils.showToast('Sample ministry data loaded!');
@@ -779,7 +580,7 @@
                 if (!state.settings.lastBackup) {
                     backupReminder = `<div id="backup-reminder" class="bg-amber-100 border-l-4 border-amber-500 text-amber-700 p-4 rounded-lg mb-6">
                         <h4 class="font-bold">Welcome!</h4>
-                        <p class="text-sm">Don't forget to make your first backup. Click the <i class="fas fa-cog"></i> icon to go to Settings and backup your data.</p>
+                        <p class="text-sm">Don't forget to make your first backup. Go to <i class="fas fa-cog"></i> Settings to backup your data.</p>
                     </div>`;
                 } else {
                     const daysSinceBackup = (new Date() - new Date(state.settings.lastBackup)) / (1000 * 60 * 60 * 24);
@@ -828,49 +629,6 @@
                         </button>
                     </div>`;
                 }
-                
-                // --- NEW: Recent Activity ---
-                const renderActivityItem = (item) => {
-                    const p = item.type === 'person' ? item.data : state.people.find(p => p.id === item.data.personId);
-                    // Handle cases where person might be deleted but activity remains
-                    const personName = p ? p.name : (item.data.personId ? 'a deleted person' : 'Someone');
-                    
-                    // Filter out items for 'myHousehold'
-                    if (p && p.family === state.settings.myHousehold) return '';
-                    // Filter out hospitality events where I am the host/guest
-                    if (item.type === 'hospitality' && (!item.data.attendee_families && !item.data.host_family)) return '';
-
-
-                    switch (item.type) {
-                        case 'update':
-                            if (!p) return ''; // Don't show updates for deleted people
-                            return `<div class="flex items-center gap-3">
-                                        <div class="bg-slate-100 text-slate-500 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="${utils.getIconForUpdateType(item.data.type)}"></i></div>
-                                        <div><p class="text-sm font-medium">Logged ${item.data.type} with ${personName}</p><p class="text-xs text-slate-400">${utils.formatRelativeTime(item.data.createdAt)}</p></div>
-                                    </div>`;
-                        case 'task':
-                            if (!p) return ''; // Don't show tasks for deleted people
-                            return `<div class="flex items-center gap-3">
-                                        <div class="bg-green-100 text-green-700 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="fas fa-check"></i></div>
-                                        <div><p class="text-sm font-medium">Completed task for ${personName}</p><p class="text-xs text-slate-400">${utils.formatRelativeTime(item.data.completedAt)}</p></div>
-                                    </div>`;
-                        case 'hospitality':
-                            const title = item.data.type === 'host' ? `Hosted ${(item.data.attendee_families || []).join(', ')}` : `Was guest at ${item.data.host_family}'s`;
-                            return `<div class="flex items-center gap-3">
-                                        <div class="bg-amber-100 text-amber-700 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="fas fa-utensils"></i></div>
-                                        <div><p class="text-sm font-medium">${title}</p><p class="text-xs text-slate-400">${utils.formatRelativeTime(item.data.date)}</p></div>
-                                    </div>`;
-                        case 'person':
-                            return `<div class="flex items-center gap-3">
-                                        <div class="bg-indigo-100 text-indigo-700 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="fas fa-user-plus"></i></div>
-                                        <div><p class="text-sm font-medium">Added ${personName} to congregation</p><p class="text-xs text-slate-400">${utils.formatRelativeTime(item.data.createdAt)}</p></div>
-                                    </div>`;
-                        default: return '';
-                    }
-                };
-                const recentActivity = utils.getRecentActivity();
-                const activityItemsHTML = recentActivity.map(renderActivityItem).filter(Boolean).join('');
-                // --- End Recent Activity ---
 
                 ui.mainContent.innerHTML = `<div class="animate-enter space-y-6">
                     ${backupReminder}
@@ -906,28 +664,14 @@
                             ${upcomingMilestones.length > 0 ? upcomingMilestones.map(m => {
                                 const p = state.people.find(person => person.id === m.personId);
                                 if (!p) return '';
-                                return `<div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="bg-yellow-100 text-yellow-600 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="${utils.getIconForMilestoneType(m.type)}"></i></div>
-                                        <div>
-                                            <p class="font-medium text-slate-800">${p.name}</p>
-                                            <p class="text-sm text-slate-500">${m.type} on ${utils.formatDate(m.nextOccurrence, {month: 'short', day: 'numeric'})}</p>
-                                        </div>
+                                return `<div class="flex items-center gap-3">
+                                    <div class="bg-yellow-100 text-yellow-600 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full"><i class="${utils.getIconForMilestoneType(m.type)}"></i></div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">${p.name}</p>
+                                        <p class="text-sm text-slate-500">${m.type} on ${utils.formatDate(m.nextOccurrence, {month: 'short', day: 'numeric'})}</p>
                                     </div>
-                                    <!-- NEW: AI Message Button -->
-                                    <button class="ai-milestone-message-btn text-sky-600 hover:text-sky-800 w-10 h-10 flex items-center justify-center" title="Get AI Message Template" data-person-id="${p.id}" data-milestone-type="${m.type}">
-                                        <i class="fas fa-comment-dots text-xl"></i>
-                                    </button>
                                 </div>`
                             }).join('') : '<p class="text-center text-slate-500 py-4">No upcoming milestones.</p>'}
-                        </div>
-                    </div>
-
-                    <!-- NEW: Recent Activity Widget -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-slate-700 mb-3 px-2">Recent Activity</h3>
-                        <div class="bg-white rounded-2xl shadow-sm p-4 space-y-4">
-                            ${activityItemsHTML.length > 0 ? activityItemsHTML : '<p class="text-center text-slate-500 py-4">No recent activity to show.</p>'}
                         </div>
                     </div>
 
@@ -1040,63 +784,10 @@
 
                 const householdMembers = person.family ? state.people.filter(p => p.family === person.family && p.id !== person.id) : [];
 
-                // --- NEW: Timeline Generation Logic ---
-                const getTimelineEvents = () => {
-                    const personUpdates = state.updates.filter(u => u.personId === personId)
-                        .map(u => ({ 
-                            date: new Date(u.createdAt), 
-                            type: 'update', 
-                            icon: utils.getIconForUpdateType(u.type),
-                            color: 'bg-sky-500',
-                            title: u.type,
-                            text: u.notes,
-                            rawData: u
-                        }));
-                        
-                    const personTasks = state.tasks.filter(t => t.personId === personId && t.completed && t.completedAt)
-                        .map(t => ({ 
-                            date: new Date(t.completedAt), 
-                            type: 'task', 
-                            icon: 'fas fa-check',
-                            color: 'bg-green-500',
-                            title: 'Task Completed',
-                            text: t.description,
-                            rawData: t
-                        }));
-                        
-                    const personMilestones = state.milestones.filter(m => m.personId === personId)
-                        .map(m => ({
-                            date: new Date(m.date),
-                            type: 'milestone',
-                            icon: utils.getIconForMilestoneType(m.type),
-                            color: 'bg-yellow-500',
-                            title: m.type,
-                            text: `Celebrated ${m.type.toLowerCase()} on ${utils.formatDate(m.date)}`,
-                            rawData: m
-                        }));
-                    
-                    const personPrayerReqs = state.prayerRequests.filter(pr => pr.personId === personId)
-                        .map(pr => ({
-                            date: new Date(pr.createdAt),
-                            type: 'prayer',
-                            icon: 'fas fa-hands-praying',
-                            color: 'bg-purple-500',
-                            title: `Prayer Request Added (${pr.status})`,
-                            text: pr.request,
-                            rawData: pr
-                        }));
-
-                    // Combine all events and sort them
-                    return [...personUpdates, ...personTasks, ...personMilestones, ...personPrayerReqs]
-                           .sort((a, b) => b.date.getTime() - a.date.getTime());
-                };
-                
-                const timelineEvents = getTimelineEvents();
-                
+                const personUpdates = state.updates.filter(u => u.personId === personId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 const personTasks = state.tasks.filter(t => t.personId === personId).sort((a, b) => (a.completed - b.completed) || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 const personMilestones = state.milestones.filter(m => m.personId === personId).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
                 const personPrayerReqs = state.prayerRequests.filter(pr => pr.personId === personId).sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-                // --- End Timeline Logic ---
 
                 ui.mainContent.innerHTML = `<div class="animate-enter">
                     <button id="back-to-people" class="text-slate-500 hover:text-sky-600 mb-4 -ml-1 flex items-center gap-2 font-medium"><i class="fas fa-arrow-left text-lg"></i> Back to People</button>
@@ -1144,24 +835,16 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-500 mt-4">Contact Pulse (days)</label>
-                            <div class="flex items-center gap-2">
-                                <input type="number" id="person-detail-pulse" value="${person.pulse || state.settings.defaultPulse}" class="w-full person-detail-input">
-                                <button type="button" id="ai-suggest-pulse-btn" data-person-id="${person.id}" class="bg-sky-100 text-sky-700 font-semibold px-3 py-1.5 rounded-lg" title="AI Suggest Pulse">✨ Suggest</button>
-                            </div>
-                            <div id="ai-pulse-suggestion" class="hidden mt-2 p-2 bg-sky-50 text-sky-800 text-sm rounded-lg"></div>
+                            <input type="number" id="person-detail-pulse" value="${person.pulse || DEFAULT_PULSE}" class="w-full person-detail-input">
                         </div>
                         <button id="save-person-details-btn" class="w-full bg-sky-600 text-white font-semibold py-2.5 rounded-lg hover:bg-sky-700 transition text-sm mt-6">
                             Save Changes
                         </button>
                     </div>
 
-                    <!-- MODIFIED: Added WhatsApp, changed grid to 5, changed Update to Log -->
-                    <div class="grid grid-cols-5 gap-2 mb-6">
-                        <button data-person-id="${person.id}" class="add-whatsapp-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-green-600 hover:bg-slate-50 transition flex flex-col items-center gap-1 ${!person.phone ? 'opacity-50 cursor-not-allowed' : ''}" ${!person.phone ? 'disabled' : ''} title="Send WhatsApp Message">
-                            <i class="fab fa-whatsapp"></i><span class="text-xs">WhatsApp</span>
-                        </button>
+                    <div class="grid grid-cols-4 gap-2 mb-6">
                         <button data-person-id="${person.id}" class="add-update-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-slate-700 hover:bg-slate-50 transition flex flex-col items-center gap-1">
-                            <i class="fas fa-plus-circle text-sky-500"></i><span class="text-xs">Log</span>
+                            <i class="fas fa-plus-circle text-sky-500"></i><span class="text-xs">Update</span>
                         </button>
                         <button data-person-id="${person.id}" class="add-task-btn bg-white p-3 rounded-xl shadow-sm text-center font-medium text-slate-700 hover:bg-slate-50 transition flex flex-col items-center gap-1">
                             <i class="fas fa-clipboard-check text-green-500"></i><span class="text-xs">Task</span>
@@ -1175,46 +858,36 @@
                     </div>
 
                     <div class="flex border-b border-slate-200 mb-4">
-                        <!-- NEW: Renamed "Updates" to "Timeline" -->
-                        <button class="person-tab-btn active" data-tab="timeline">Timeline</button>
+                        <button class="person-tab-btn active" data-tab="updates">Updates</button>
                         <button class="person-tab-btn" data-tab="tasks">Tasks</button>
                         <button class="person-tab-btn" data-tab="milestones">Milestones</button>
                         <button class="person-tab-btn" data-tab="prayer">Prayer</button>
                         <button class="person-tab-btn" data-tab="calling">Calling</button>
                     </div>
 
-                    <div id="person-tab-content">
-                        <!-- --- NEW: Timeline View --- -->
-                        <div id="timeline-content" class="tab-pane">
-                            <div class="timeline">
-                                ${timelineEvents.length > 0 ? timelineEvents.map(item => `
-                                    <div class="timeline-item">
-                                        <div class="timeline-icon ${item.color}">
-                                            <i class="${item.icon}"></i>
+                    <div id="person-tab-content" class="space-y-4">
+                        <div id="updates-content" class="tab-pane">
+                            ${personUpdates.length > 0 ? personUpdates.map(u => `
+                                <div class="bg-white p-4 rounded-xl shadow-sm">
+                                    <div class="flex items-start gap-4">
+                                        <div class="bg-slate-100 text-slate-500 h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full">
+                                            <i class="${utils.getIconForUpdateType(u.type)}"></i>
                                         </div>
-                                        <div class="timeline-content">
-                                            <div class="flex justify-between items-baseline mb-1">
-                                                <p class="font-semibold text-slate-700">${item.title}</p>
-                                                <p class="text-xs text-slate-400">${utils.formatDate(item.date)}</p>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-baseline">
+                                                <p class="font-semibold text-slate-700">${u.type}</p>
+                                                <p class="text-xs text-slate-400">${utils.formatDate(u.createdAt)}</p>
                                             </div>
-                                            <p class="text-slate-600 text-sm mt-1 whitespace-pre-wrap">${item.text}</p>
-                                            
-                                            <!-- Edit/Delete for original items -->
-                                            ${item.type === 'update' ? `
-                                            <div class="flex justify-end gap-2 mt-2 pt-2 border-t border-slate-100">
-                                                <button data-update-id="${item.rawData.id}" class="edit-update-btn text-xs font-semibold text-slate-400 hover:text-sky-600">EDIT</button>
-                                                <button data-update-id="${item.rawData.id}" class="delete-update-btn text-xs font-semibold text-slate-400 hover:text-red-500">DELETE</button>
-                                            </div>` : ''}
-                                            ${item.type === 'task' ? `
-                                            <div class="flex justify-end gap-2 mt-2 pt-2 border-t border-slate-100">
-                                                <button data-task-id="${item.rawData.id}" class="delete-task-btn text-xs font-semibold text-slate-400 hover:text-red-500">DELETE</button>
-                                            </div>` : ''}
+                                            <p class="text-slate-600 mt-1 whitespace-pre-wrap">${u.notes}</p>
                                         </div>
                                     </div>
-                                `).join('') : `<p class="text-center text-slate-500 py-8">No activity logged for ${person.name}.</p>`}
-                            </div>
+                                    <div class="flex justify-end gap-2 mt-2 pt-2 border-t border-slate-100">
+                                        <button data-update-id="${u.id}" class="edit-update-btn text-xs font-semibold text-slate-400 hover:text-sky-600">EDIT</button>
+                                        <button data-update-id="${u.id}" class="delete-update-btn text-xs font-semibold text-slate-400 hover:text-red-500">DELETE</button>
+                                    </div>
+                                </div>`).join('') : `<p class="text-center text-slate-500 py-8">No updates logged for ${person.name}.</p>`}
                         </div>
-                        <div id="tasks-content" class="tab-pane hidden space-y-4">
+                        <div id="tasks-content" class="tab-pane hidden">
                              ${personTasks.length > 0 ? personTasks.map(t => `
                                 <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between">
                                     <div class="flex items-center gap-3">
@@ -1229,7 +902,7 @@
                                     <button data-task-id="${t.id}" class="delete-task-btn text-slate-400 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
                                 </div>`).join('') : `<p class="text-center text-slate-500 py-8">No tasks for ${person.name}.</p>`}
                         </div>
-                        <div id="milestones-content" class="tab-pane hidden space-y-4">
+                        <div id="milestones-content" class="tab-pane hidden">
                             ${personMilestones.length > 0 ? personMilestones.map(m => `
                                 <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between">
                                     <div class="flex items-center gap-4">
@@ -1245,7 +918,7 @@
                                     </div>
                                 </div>`).join('') : `<p class="text-center text-slate-500 py-8">No milestones for ${person.name}.</p>`}
                         </div>
-                        <div id="prayer-content" class="tab-pane hidden space-y-4">
+                        <div id="prayer-content" class="tab-pane hidden">
                             <div class="text-right mb-4">
                                 <button data-person-id="${person.id}" class="add-prayer-request-btn bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg">Add Prayer Request</button>
                             </div>
@@ -1263,7 +936,7 @@
                                             <button data-pr-id="${pr.id}" class="edit-prayer-request-btn text-xs font-semibold text-slate-400 hover:text-sky-600">EDIT</button>
                                             <button data-pr-id="${pr.id}" class="delete-prayer-request-btn text-xs font-semibold text-slate-400 hover:text-red-500">DELETE</button>
                                         </div>
-                                    </div>`).join('') : `<p class="text-center text-slate-500 py-8">No prayer requests for ${person.name}.</p>`}
+                                    </div>`).join('') : `<p class="text-center text-slate-500 py-8">No prayer requests logged for ${person.name}.</p>`}
                             </div>
                         </div>
                          <div id="calling-content" class="tab-pane hidden">
@@ -1273,13 +946,13 @@
                                         <div>
                                             <label class="block text-lg font-semibold text-slate-700 mb-2">Spiritual Gifts</label>
                                             <div class="max-h-48 overflow-y-auto space-y-1 p-2 border rounded-lg">
-                                                ${state.settings.spiritualGifts.map(g => `<label class="flex items-center gap-2 p-1"><input type="checkbox" name="gifts" value="${g}" ${(person.gifts || []).includes(g) ? 'checked' : ''}>${g}</label>`).join('')}
+                                                ${state.spiritualGifts.map(g => `<label class="flex items-center gap-2 p-1"><input type="checkbox" name="gifts" value="${g}" ${(person.gifts || []).includes(g) ? 'checked' : ''}>${g}</label>`).join('')}
                                             </div>
                                         </div>
                                         <div>
                                             <label class="block text-lg font-semibold text-slate-700 mb-2">Church Roles</label>
                                             <div class="max-h-48 overflow-y-auto space-y-1 p-2 border rounded-lg">
-                                                ${state.settings.churchRoles.map(r => `<label class="flex items-center gap-2 p-1"><input type="checkbox" name="roles" value="${r}" ${(person.roles || []).includes(r) ? 'checked' : ''}>${r}</label>`).join('')}
+                                                ${state.churchRoles.map(r => `<label class="flex items-center gap-2 p-1"><input type="checkbox" name="roles" value="${r}" ${(person.roles || []).includes(r) ? 'checked' : ''}>${r}</label>`).join('')}
                                             </div>
                                         </div>
                                     </div>
@@ -1302,7 +975,7 @@
                 
                 const completedTasks = state.tasks
                     .filter(t => t.completed && state.people.some(p => p.id === t.personId && p.family !== state.settings.myHousehold))
-                    .sort((a,b) => new Date(b.completedAt || b.createdAt).getTime() - new Date(a.completedAt || a.createdAt).getTime())
+                    .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .slice(0, 20); // Show only last 20
 
                 const renderTaskList = (tasks, isEmptyMessage) => {
@@ -1321,7 +994,7 @@
                                         <p class="font-medium ${t.completed ? 'text-slate-400 line-through' : 'text-slate-800'}">${t.description}</p>
                                         <p class="text-sm text-slate-500">
                                             ${person ? `For: ${person.name}` : ''}
-                                            ${person ? '<span class="mx-1">&bull;</span>' : ''}
+                                            <span class="mx-1">&bull;</span>
                                             Due: ${utils.formatDate(t.dueDate)}
                                         </p>
                                     </div>
@@ -1479,65 +1152,40 @@
                     </div>
                 </div>`;
             },
-            // --- NEW: Settings Page ---
             settings() {
                 const households = [{name: "None", members:[]}].concat(utils.getHouseholds());
                 const myHousehold = state.settings.myHousehold || "None";
                 
-                ui.mainContent.innerHTML = `<div class="animate-enter space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="text-xl font-bold mb-4">App Settings</h3>
-                        <form id="settings-form" class="space-y-4">
-                            <div>
-                                <label for="my-household-select" class="block text-sm font-medium text-slate-600 mb-1">My Household</label>
-                                <select id="my-household-select" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                                    ${households.map(h => `<option value="${h.name}" ${h.name === myHousehold ? 'selected' : ''}>${h.name}</option>`).join('')}
-                                </select>
-                                <p class="text-xs text-slate-500 mt-1">Select your own family to exclude it from pastoral lists.</p>
-                            </div>
-                            <div>
-                                <label for="default-pulse-input" class="block text-sm font-medium text-slate-600 mb-1">Default Contact Pulse (days)</label>
-                                <input type="number" id="default-pulse-input" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${state.settings.defaultPulse}">
-                                <p class="text-xs text-slate-500 mt-1">Default reminder time for new people.</p>
-                            </div>
-                        </form>
-                    </div>
+                modalService.open(`<div class="p-6">
+                    <h3 class="text-xl font-bold mb-4">Settings</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="my-household-select" class="block text-sm font-medium text-slate-600 mb-1">My Household</label>
+                            <select id="my-household-select" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                ${households.map(h => `<option value="${h.name}" ${h.name === myHousehold ? 'selected' : ''}>${h.name}</option>`).join('')}
+                            </select>
+                            <p class="text-xs text-slate-500 mt-1">Select your own family to exclude it from pastoral lists.</p>
+                        </div>
+                        
+                        <button id="save-settings-btn" class="w-full bg-sky-600 text-white font-semibold py-2.5 rounded-lg">Save Settings</button>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="text-xl font-bold mb-4">Customize App Lists</h3>
-                        <form id="customize-form" class="space-y-4">
-                            <div>
-                                <label for="update-types-textarea" class="block text-sm font-medium text-slate-600 mb-1">Update Types (one per line)</label>
-                                <textarea id="update-types-textarea" class="settings-textarea">${state.settings.updateTypes.join('\n')}</textarea>
-                            </div>
-                            <div>
-                                <label for="gifts-textarea" class="block text-sm font-medium text-slate-600 mb-1">Spiritual Gifts (one per line)</label>
-                                <textarea id="gifts-textarea" class="settings-textarea">${state.settings.spiritualGifts.join('\n')}</textarea>
-                            </div>
-                             <div>
-                                <label for="roles-textarea" class="block text-sm font-medium text-slate-600 mb-1">Church Roles (one per line)</label>
-                                <textarea id="roles-textarea" class="settings-textarea">${state.settings.churchRoles.join('\n')}</textarea>
-                            </div>
-                        </form>
-                    </div>
+                        <hr class="my-4">
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h3 class="text-xl font-bold mb-4">Backup & Restore</h3>
-                        <p class="text-sm text-slate-500 mb-3">Save your data to a file, or restore from a previous backup.</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button id="modal-backup-btn" class="bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2">
-                                <i class="fas fa-download"></i> Backup Now
-                            </button>
-                            <button id="modal-restore-btn" class="bg-slate-200 text-slate-800 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2">
-                                <i class="fas fa-upload"></i> Restore
-                            </button>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Backup & Restore</h4>
+                            <p class="text-sm text-slate-500 mb-3">Save your data to a file, or restore from a previous backup.</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button id="modal-backup-btn" class="bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+                                    <i class="fas fa-download"></i> Backup Now
+                                </button>
+                                <button id="modal-restore-btn" class="bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+                                    <i class="fas fa-upload"></i> Restore
+                                </button>
+                            </div>
                         </div>
                     </div>
-
-                    <button id="save-settings-btn" class="w-full bg-sky-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-sky-700 transition">
-                        Save All Settings
-                    </button>
-                </div>`;
+                </div>`);
             }
         };
 
@@ -1628,69 +1276,6 @@
                     loadingEl.classList.add('hidden');
                 }
             },
-            // --- NEW: AI Milestone Message ---
-            async getMilestoneMessage(personId, milestoneType) {
-                const person = state.people.find(p => p.id === personId);
-                if (!person) return;
-                
-                const systemPrompt = "You are a pastor. Write a brief (2-3 sentences), warm, and encouraging WhatsApp message to a church member for their upcoming milestone. Sign off as 'Pastor'.";
-                const userPrompt = `Person: ${person.name}\nMilestone: ${milestoneType}\n\nWrite the WhatsApp message.`;
-
-                try {
-                    const result = await utils.callGeminiApi(systemPrompt, userPrompt);
-                    // Open a modal to show the message and let user copy it
-                    modalService.open(`<div class="p-6">
-                        <h3 class="text-xl font-bold mb-4">Suggested Message</h3>
-                        <p class="text-slate-500 mb-4">Here's a suggestion for ${person.name}:</p>
-                        <div class="gemini-output-card">
-                            <button class="copy-btn" data-text="${encodeURIComponent(result)}"><i class="fas fa-copy"></i> Copy</button>
-                            <p class="text-sm">${result.replace(/\n/g, '<br>')}</p>
-                        </div>
-                        <button type="button" class="close-modal-btn w-full mt-4 bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-lg">Close</button>
-                    </div>`);
-                } catch (error) {
-                    utils.showToast(`Error generating message: ${error.message}`);
-                }
-            },
-            // --- NEW: AI Suggest Pulse ---
-            async getSuggestedPulse(personId) {
-                const person = state.people.find(p => p.id === personId);
-                if (!person) return;
-
-                const outputEl = document.getElementById('ai-pulse-suggestion');
-                outputEl.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Analyzing...`;
-                outputEl.classList.remove('hidden');
-
-                const systemPrompt = "You are a pastoral assistant. Given a person's key info and update history, suggest an optimal 'contact pulse' (in days) for a pastor. Justify your answer in one sentence. Finally, provide the number on a new line in this exact format: `SUGGESTED PULSE: 30`";
-                let userPrompt = `Person: ${person.name}\n`;
-                if (person.keyInfo) userPrompt += `Key Info: ${person.keyInfo}\n`;
-                
-                const last5Updates = state.updates
-                    .filter(u => u.personId === personId)
-                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                    .slice(0, 5)
-                    .map(u => `- ${utils.formatDate(u.createdAt)} (${u.type}): ${u.notes.substring(0, 50)}...`)
-                    .join('\n');
-                
-                if (last5Updates) userPrompt += `Update History (Last 5):\n${last5Updates}`;
-
-                try {
-                    const result = await utils.callGeminiApi(systemPrompt, userPrompt);
-                    
-                    const pulseMatch = result.match(/SUGGESTED PULSE: (\d+)/);
-                    if (pulseMatch && pulseMatch[1]) {
-                        const pulse = pulseMatch[1];
-                        document.getElementById('person-detail-pulse').value = pulse;
-                        const justification = result.split('SUGGESTED PULSE:')[0].trim();
-                        outputEl.innerHTML = `<strong>Suggestion: ${pulse} days.</strong> ${justification}`;
-                    } else {
-                        outputEl.innerHTML = "Could not extract a pulse number, but here's the analysis: " + result;
-                    }
-
-                } catch (error) {
-                    outputEl.innerHTML = "Could not get suggestion.";
-                }
-            }
         };
 
         // --- MODALS (Content Generators) ---
@@ -1706,34 +1291,25 @@
                         <div>
                             <label for="update-type" class="block text-sm font-medium text-slate-600 mb-1">Type</label>
                             <select id="update-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                                ${state.settings.updateTypes.map(t => `<option value="${t}" ${t === 'WhatsApp Chat' ? 'selected' : ''}>${t}</option>`).join('')}
+                                <option value="WhatsApp Chat">WhatsApp Chat</option>
+                                <option value="Phone Call">Phone Call</option>
+                                <option value="Meeting">Meeting</option>
+                                <option value="Home Visit">Home Visit</option>
+                                <option value="Hospital Visit">Hospital Visit</option>
+                                <option value="Prayer">Prayer</option>
+                                <option value="Counseling">Counseling</option>
+                                <option value="General Note">General Note</option>
                             </select>
                         </div>
                         <div>
                             <label for="update-notes" class="block text-sm font-medium text-slate-600 mb-1">Notes from conversation</label>
                             <textarea id="update-notes" rows="5" class="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Enter details here..."></textarea>
                         </div>
-                        <!-- NEW: Smart Follow-up -->
-                        <div id="follow-up-container" class="hidden">
-                            <label class="flex items-center gap-2">
-                                <input type="checkbox" id="schedule-follow-up-check" class="h-4 w-4 rounded">
-                                <span class="text-sm font-medium text-slate-700">Schedule 3-day follow-up task?</span>
-                            </label>
-                        </div>
                     </div>
                     <div class="mt-6 flex justify-end">
                         <button type="submit" class="w-full bg-sky-600 text-white font-semibold py-2.5 px-5 rounded-lg">Log Contact</button>
                     </div>
                 </form>`);
-                
-                // NEW: Show follow-up checkbox based on type
-                const typeSelect = document.getElementById('update-type');
-                const followUpContainer = document.getElementById('follow-up-container');
-                const checkFollowUp = (type) => {
-                    followUpContainer.classList.toggle('hidden', !state.settings.followUpTriggers.includes(type));
-                };
-                checkFollowUp(typeSelect.value); // Check on initial render
-                typeSelect.addEventListener('change', (e) => checkFollowUp(e.target.value));
             },
             addEditPerson(person) { 
                 const isEditing = !!person; 
@@ -1766,7 +1342,7 @@
                         </div>
                         <div>
                             <label for="person-pulse" class="block text-sm font-medium text-slate-600 mb-1">Contact Pulse (days)</label>
-                            <input type="number" id="person-pulse" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.pulse || state.settings.defaultPulse}" required>
+                            <input type="number" id="person-pulse" class="w-full px-3 py-2 border border-slate-300 rounded-lg" value="${person?.pulse || DEFAULT_PULSE}" required>
                             <p class="text-xs text-slate-500 mt-1">Remind me if no contact is logged in this many days.</p>
                         </div>
                     </div>
@@ -1782,7 +1358,7 @@
                     .sort((a,b) => a.name.localeCompare(b.name))
                     .map(p => `<option value="${p.id}" ${personId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
                 const personSelect = personId === null ? `<div><label class="block text-sm font-medium text-slate-600 mb-1">Person</label><select id="update-person-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg" required>${peopleOptions}</select></div>` : '';
-                const types = state.settings.updateTypes;
+                const types = ['Meeting', 'Phone Call', 'WhatsApp Chat', 'Hospital Visit', 'Home Visit', 'Prayer', 'Counseling', 'General Note'];
                 modalService.open(`<form id="update-form" class="p-6" data-person-id="${personId || ''}" data-update-id="${update?.id || ''}">
                     <h3 class="text-xl font-bold mb-4">${isEditing ? 'Edit' : 'Log'} Update</h3>
                     <div class="space-y-4">
@@ -1795,25 +1371,9 @@
                             <label class="block text-sm font-medium text-slate-600 mb-1">Notes</label>
                             <textarea id="update-notes" rows="4" class="w-full px-3 py-2 border border-slate-300 rounded-lg" required>${update?.notes || ''}</textarea>
                         </div>
-                        <!-- NEW: Smart Follow-up -->
-                        <div id="follow-up-container" class="hidden">
-                            <label class="flex items-center gap-2">
-                                <input type="checkbox" id="schedule-follow-up-check" class="h-4 w-4 rounded">
-                                <span class="text-sm font-medium text-slate-700">Schedule 3-day follow-up task?</span>
-                            </label>
-                        </div>
                     </div>
                     <div class="mt-6 flex justify-end"><button type="submit" class="w-full bg-sky-600 text-white font-semibold py-2.5 px-5 rounded-lg">Save Update</button></div>
                 </form>`);
-                
-                // NEW: Show follow-up checkbox based on type
-                const typeSelect = document.getElementById('update-type');
-                const followUpContainer = document.getElementById('follow-up-container');
-                const checkFollowUp = (type) => {
-                    followUpContainer.classList.toggle('hidden', !state.settings.followUpTriggers.includes(type));
-                };
-                checkFollowUp(typeSelect.value); // Check on initial render
-                typeSelect.addEventListener('change', (e) => checkFollowUp(e.target.value));
             },
             addEditTask(personId = null) {
                 const peopleOptions = state.people
@@ -1930,18 +1490,11 @@
                     <div class="mt-6 flex justify-end"><button type="submit" class="w-full bg-amber-500 text-white font-semibold py-2.5 px-5 rounded-lg">Save Journal</button></div>
                 </form>`);
             },
-            addEditPrayerRequest(personId = null, request = null) {
+            addEditPrayerRequest(personId, request) {
                 const isEditing = !!request;
-                const peopleOptions = state.people
-                    .filter(p => p.family !== state.settings.myHousehold)
-                    .sort((a,b) => a.name.localeCompare(b.name))
-                    .map(p => `<option value="${p.id}" ${personId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
-                const personSelect = personId === null ? `<div><label class="block text-sm font-medium text-slate-600 mb-1">Person</label><select id="prayer-person-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg" required>${peopleOptions}</select></div>` : '';
-
-                modalService.open(`<form id="prayer-request-form" class="p-6" data-person-id="${personId || ''}" data-pr-id="${request?.id || ''}">
+                modalService.open(`<form id="prayer-request-form" class="p-6" data-person-id="${personId}" data-pr-id="${request?.id || ''}">
                     <h3 class="text-xl font-bold mb-4">${isEditing ? 'Edit' : 'Add'} Prayer Request</h3>
-                    ${personSelect}
-                    <textarea id="prayer-request-text" class="w-full px-3 py-2 border border-slate-300 rounded-lg mt-4" rows="5" required>${request?.request || ''}</textarea>
+                    <textarea id="prayer-request-text" class="w-full px-3 py-2 border border-slate-300 rounded-lg" rows="5" required>${request?.request || ''}</textarea>
                     <div class="mt-6 flex justify-end"><button type="submit" class="w-full bg-sky-600 text-white font-semibold py-2.5 px-5 rounded-lg">Save Request</button></div>
                 </form>`);
             },
@@ -2011,28 +1564,7 @@
                         db.restore(e.target.files[0]);
                     }
                 });
-                ui.settingsBtn.addEventListener('click', () => this.navigateTo('settings'));
-                ui.backToDashboardBtn.addEventListener('click', () => this.navigateTo('dashboard'));
-
-                // --- NEW: FAB Listeners ---
-                ui.fabBtn.addEventListener('click', () => this.toggleFabMenu());
-                document.getElementById('fab-log-update').addEventListener('click', () => {
-                    modals.addEditUpdate();
-                    this.toggleFabMenu(false); // Close menu
-                });
-                document.getElementById('fab-add-task').addEventListener('click', () => {
-                    modals.addEditTask();
-                    this.toggleFabMenu(false); // Close menu
-                });
-                document.getElementById('fab-add-prayer').addEventListener('click', () => {
-                    modals.addEditPrayerRequest();
-                    this.toggleFabMenu(false); // Close menu
-                });
-                 document.getElementById('fab-add-hospitality').addEventListener('click', () => {
-                    modals.addEditHospitalityEvent();
-                    this.toggleFabMenu(false); // Close menu
-                });
-                // --- End FAB Listeners ---
+                ui.settingsBtn.addEventListener('click', () => render.settings());
 
                 // Main Content Event Delegation
                 ui.mainContent.addEventListener('click', e => {
@@ -2057,7 +1589,6 @@
                          '#quick-add-update': () => modals.addEditUpdate(),
                          '#get-conversation-starters': el => geminiService.getConversationStarters(el.dataset.personId),
                          '.log-hospitality-btn': el => modals.addEditHospitalityEvent(null, [el.dataset.families]),
-                         '.ai-milestone-message-btn': el => geminiService.getMilestoneMessage(el.dataset.personId, el.dataset.milestoneType),
 
                          // --- Prayer List ---
                          '#ai-prayer-summary-btn': () => geminiService.getPrayerSummary(),
@@ -2065,7 +1596,6 @@
                          // --- Person Detail ---
                          '#back-to-people': () => this.navigateTo('people'),
                          '#save-person-details-btn': () => this.savePersonDetails(),
-                         '#ai-suggest-pulse-btn': el => geminiService.getSuggestedPulse(el.dataset.personId),
                          '#delete-person-btn': el => {
                             const personId = el.dataset.personId;
                             const person = state.people.find(p => p.id === personId);
@@ -2073,15 +1603,6 @@
                                 modals.confirm(`Delete ${person.name}?`, 'This will permanently delete their profile and all associated data.', () => this.deletePerson(personId));
                             }
                          },
-                         // --- NEW: WhatsApp button on Person Detail ---
-                         '.add-whatsapp-btn': el => {
-                            const person = state.selectedPerson;
-                            if (person && person.phone) {
-                                window.open(`https://wa.me/${utils.formatPhoneNumberForWhatsApp(person.phone)}`, '_blank');
-                            } else if (person) {
-                                utils.showToast('No phone number on file for this person.');
-                            }
-                        },
                          '.add-update-btn': el => modals.addEditUpdate(el.dataset.personId),
                          '.edit-update-btn': el => modals.addEditUpdate(state.selectedPerson.id, state.updates.find(u => u.id === el.dataset.updateId)),
                          '.delete-update-btn': el => modals.confirm('Delete Update?', 'This action cannot be undone.', () => this.deleteUpdate(el.dataset.updateId)),
@@ -2106,26 +1627,6 @@
                          '.edit-hospitality-btn': el => modals.addEditHospitalityEvent(state.hospitality.find(h => h.id === el.dataset.eventId)),
                          '.delete-hospitality-btn': el => modals.confirm('Delete Event?', 'This will be removed.', () => this.deleteHospitalityEvent(el.dataset.eventId)),
                          '.log-hospitality-journal-btn': el => modals.logHospitalityJournal(el.dataset.eventId),
-
-                         // --- NEW: Settings Page Buttons ---
-                         '#save-settings-btn': () => {
-                            // General Settings
-                            const myHousehold = document.getElementById('my-household-select').value;
-                            state.settings.myHousehold = myHousehold === "None" ? null : myHousehold;
-                            state.settings.defaultPulse = parseInt(document.getElementById('default-pulse-input').value, 10) || 30;
-
-                            // Custom Lists
-                            const parseTextarea = (id) => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(Boolean);
-                            state.settings.updateTypes = parseTextarea('update-types-textarea');
-                            state.settings.spiritualGifts = parseTextarea('gifts-textarea');
-                            state.settings.churchRoles = parseTextarea('roles-textarea');
-
-                            db.save();
-                            utils.showToast('Settings saved!');
-                            this.navigateTo('dashboard');
-                         },
-                         '#modal-backup-btn': () => db.backup(),
-                         '#modal-restore-btn': () => ui.restoreInput.click(),
                     };
 
                     for (const selector in eventMap) {
@@ -2145,6 +1646,16 @@
                     
                     // Specific Modal Buttons
                     const eventMap = {
+                        '#save-settings-btn': () => {
+                            const myHousehold = document.getElementById('my-household-select').value;
+                            state.settings.myHousehold = myHousehold === "None" ? null : myHousehold;
+                            db.save();
+                            utils.showToast('Settings saved!');
+                            modalService.close();
+                            this.refreshCurrentView(); // Refresh to apply filters
+                        },
+                        '#modal-backup-btn': () => { db.backup(); modalService.close(); },
+                        '#modal-restore-btn': () => { ui.restoreInput.click(); modalService.close(); },
                         '#ai-task-breakdown-btn': () => {
                             const desc = document.getElementById('task-description').value;
                             if (desc) geminiService.getTaskBreakdown(desc);
@@ -2157,19 +1668,6 @@
                             const isHost = el.value === 'host';
                             document.getElementById('host-fields').classList.toggle('hidden', !isHost);
                             document.getElementById('guest-fields').classList.toggle('hidden', isHost);
-                        },
-                        // NEW: Handle copy button in AI message modal
-                        '.copy-btn': el => {
-                            const text = decodeURIComponent(el.dataset.text);
-                            if (navigator.clipboard) {
-                                navigator.clipboard.writeText(text).then(() => {
-                                    utils.showToast('Copied to clipboard!');
-                                }).catch(err => {
-                                    utils.fallbackCopyText(text);
-                                });
-                            } else {
-                                utils.fallbackCopyText(text);
-                            }
                         }
                     };
 
@@ -2196,7 +1694,7 @@
                             phone: form.querySelector('#person-phone').value,
                             email: form.querySelector('#person-email').value,
                             keyInfo: form.querySelector('#person-keyinfo').value,
-                            pulse: parseInt(form.querySelector('#person-pulse').value, 10) || state.settings.defaultPulse,
+                            pulse: parseInt(form.querySelector('#person-pulse').value, 10) || DEFAULT_PULSE,
                         };
                         
                         const existing = state.people.find(p => p.id === personId);
@@ -2215,10 +1713,9 @@
                         const personId = form.dataset.personId || form.querySelector('#update-person-id')?.value;
                         if (!personId) { utils.showToast('Please select a person.'); return; }
                         
-                        const updateType = form.querySelector('#update-type').value;
                         const data = {
                             id: updateId,
-                            type: updateType,
+                            type: form.querySelector('#update-type').value,
                             notes: form.querySelector('#update-notes').value,
                             personId: personId
                         };
@@ -2232,25 +1729,6 @@
                             state.updates.push(data);
                             utils.showToast('Update logged!');
                         }
-                        
-                        // --- NEW: Smart Follow-Up Task Creation ---
-                        const scheduleFollowUp = form.querySelector('#schedule-follow-up-check')?.checked;
-                        if (scheduleFollowUp) {
-                            const person = state.people.find(p => p.id === personId);
-                            const taskDesc = `Follow-up for ${updateType} with ${person ? person.name : 'someone'}`;
-                            const dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(); // 3 days from now
-                            
-                            state.tasks.push({
-                                id: crypto.randomUUID(),
-                                personId,
-                                description: taskDesc,
-                                dueDate,
-                                completed: false,
-                                createdAt: new Date().toISOString()
-                            });
-                            utils.showToast('Follow-up task created!');
-                        }
-                        // --- End Smart Follow-Up ---
                     }
                     
                     if (form.id === 'task-form') {
@@ -2360,9 +1838,7 @@
 
                     if (form.id === 'prayer-request-form') {
                         const prId = form.dataset.prId || crypto.randomUUID();
-                        const personId = form.dataset.personId || form.querySelector('#prayer-person-id')?.value;
-                        if (!personId) { utils.showToast('Please select a person.'); return; }
-                        
+                        const personId = form.dataset.personId;
                         const data = {
                             id: prId,
                             request: form.querySelector('#prayer-request-text').value,
@@ -2434,7 +1910,7 @@
                     state.people.push({
                         id: crypto.randomUUID(),
                         ...contact,
-                        pulse: state.settings.defaultPulse,
+                        pulse: DEFAULT_PULSE,
                         keyInfo: "Imported from device contacts.",
                         createdAt: new Date().toISOString(),
                         photoURL: contact.photoURL || null // Ensure photoURL is saved
@@ -2452,7 +1928,7 @@
                 person.keyInfo = document.getElementById('person-detail-keyinfo').value;
                 person.phone = document.getElementById('person-detail-phone').value;
                 person.email = document.getElementById('person-detail-email').value;
-                person.pulse = parseInt(document.getElementById('person-detail-pulse').value, 10) || state.settings.defaultPulse;
+                person.pulse = parseInt(document.getElementById('person-detail-pulse').value, 10) || DEFAULT_PULSE;
                 
                 db.save();
                 utils.showToast('Details updated!');
@@ -2470,17 +1946,7 @@
                 this.navigateTo('people');
             },
             deleteUpdate(id) { state.updates = state.updates.filter(u => u.id !== id); db.save(); this.refreshCurrentView(); utils.showToast('Update deleted.'); },
-            toggleTask(id) { 
-                const task = state.tasks.find(t => t.id === id); 
-                if (task) {
-                    task.completed = !task.completed;
-                    if (task.completed) {
-                        task.completedAt = new Date().toISOString(); // Add completion timestamp!
-                    }
-                } 
-                db.save(); 
-                this.refreshCurrentView(); 
-            },
+            toggleTask(id) { const task = state.tasks.find(t => t.id === id); if (task) task.completed = !task.completed; db.save(); this.refreshCurrentView(); },
             deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); db.save(); this.refreshCurrentView(); utils.showToast('Task deleted.'); },
             deleteMilestone(id) { state.milestones = state.milestones.filter(m => m.id !== id); db.save(); this.refreshCurrentView(); utils.showToast('Milestone deleted.'); },
             deleteHospitalityEvent(id) { state.hospitality = state.hospitality.filter(h => h.id !== id); db.save(); this.refreshCurrentView(); utils.showToast('Event deleted.'); },
@@ -2495,12 +1961,6 @@
                     pane.classList.toggle('hidden', pane.id !== `${tab}-content`);
                 });
             },
-            // --- NEW: FAB Toggle ---
-            toggleFabMenu(forceState = null) {
-                state.isFabMenuOpen = forceState !== null ? forceState : !state.isFabMenuOpen;
-                ui.fabBtn.classList.toggle('open', state.isFabMenuOpen);
-                ui.fabMenu.classList.toggle('open', state.isFabMenuOpen);
-            },
             refreshCurrentView() {
                 if (!state.dataLoaded) {
                     ui.appLoading.classList.remove('hidden');
@@ -2508,27 +1968,11 @@
                     return;
                 }
                 
-                // --- NEW: Hide FAB on settings page ---
-                ui.fabContainer.classList.toggle('hidden', state.currentView === 'settings');
-
                 // Special case for person detail
                 if (state.currentView === 'person-detail' && state.selectedPerson) {
                     render.personDetail(state.selectedPerson.id);
                     return;
                 }
-
-                // Handle Settings Page
-                const isSettings = state.currentView === 'settings';
-                ui.mainNav.classList.toggle('hidden', isSettings);
-                ui.headerTitle.classList.toggle('hidden', isSettings);
-                ui.headerButtons.classList.toggle('hidden', isSettings);
-                ui.settingsHeader.classList.toggle('hidden', !isSettings);
-                
-                if (isSettings) {
-                    render.settings();
-                    return;
-                }
-                // End Handle Settings
 
                 switch (state.currentView) {
                     case 'dashboard': render.dashboard(); break;

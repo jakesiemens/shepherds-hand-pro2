@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shepherd's Hand Pro</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#f1f5f9">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#f1f5f9">
-* **Add this just before `</body>` (inside your script tag):**
-```javascript
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
-    });
-}
     <style>
         html, body {
             height: 100%;
@@ -355,6 +351,18 @@ if ('serviceWorker' in navigator) {
 
     <!-- Firebase SDK (DUMMY for API) -->
     <script type="module">
+        // --- PWA Registration (with Preview Fix) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => console.log('SW registered:', registration))
+                    .catch(error => {
+                        // This catches the error in the preview window so the app doesn't crash
+                        console.log('Service Worker registration failed (likely due to preview environment):', error);
+                    });
+            });
+        }
+
         // --- CONSTANTS & CONFIG ---
         const API_KEY = ""; // Leave blank
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
